@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Saved run data may contain company research you don't want public
+data/runs/*.json
+!data/runs/.gitkeep
