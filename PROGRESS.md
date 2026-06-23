@@ -13,6 +13,13 @@ Not started yet.
 
 ---
 
+## Known limitations
+
+- arXiv connector confidence is currently based on result count only, not actual
+  relevance — revisit so high-count/low-relevance queries don't read as high confidence.
+
+---
+
 ## Milestone checklist
 
 Check items off as completed. Do not start a milestone before the previous one's
@@ -26,7 +33,7 @@ checked items are actually done (not "mostly done").
 - [ ] `connectors/arxiv_connector.py` — real arXiv API calls, mapped to `ConnectorResult`
 - [ ] Stub files created for everything else in the tree (tavily/uspto/edgar/github
       connectors, graph.py, evals, memo/generator.py) — docstring + pass only
-- [ ] `orchestrator/prompts.py` — Phase 1 system prompt (one-minute test criteria)
+- [x] `orchestrator/prompts.py` — Phase 1 system prompt (one-minute test criteria)
 - [ ] `orchestrator/phases.py` — phase → connector mapping (just phase 1 for now)
 - [ ] `orchestrator/agent.py` — agentic loop: Claude + tool use + arXiv, returns verdict
 - [ ] `cli/run.py` — runs Phase 1 against a real company name, prints verdict
@@ -70,7 +77,12 @@ Add a short entry each session. Format:
 - What's next
 ```
 
-(No sessions yet — this is the first one.)
+### 2026-06-23
+- Built `orchestrator/prompts.py`: PHASE_PROMPTS[1] encoding the full investment thesis
+  (labor-replacement vs. augmentation, vertical vs. horizontal, weighted scoring,
+  disqualifiers, blind-spot/humility statement, confidence calibration for Phase 1).
+- Verdict values use exact hyphenated strings matching submit_verdict enum in agent.py.
+- What's next: `orchestrator/phases.py` (phase → connector mapping), then `orchestrator/agent.py` smoke test.
 
 ---
 
