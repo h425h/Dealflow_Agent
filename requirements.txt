@@ -1,0 +1,5 @@
+anthropic
+arxiv
+requests
+python-dotenv
+tavily-python
