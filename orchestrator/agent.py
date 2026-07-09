@@ -24,7 +24,8 @@ class PhaseVerdict:
     tool_calls: list
     run_id: str
     timestamp: str
-    usage: dict         # accumulated token counts across all API calls in the phase
+    usage: dict          # accumulated token counts across all API calls in the phase
+    debate: Optional[dict] = None   # Phase 3 only: bull/bear/synthesizer record, if run
 
 
 def _connector_tools(phase_number: int) -> list:
@@ -166,6 +167,7 @@ def _save_run(verdict: PhaseVerdict, messages: list) -> None:
                 "confidence": verdict.confidence,
                 "tool_calls": verdict.tool_calls,
                 "usage": verdict.usage,
+                "debate": verdict.debate,
                 "messages": _serialize_messages(messages),
             },
             indent=2,
@@ -174,23 +176,21 @@ def _save_run(verdict: PhaseVerdict, messages: list) -> None:
     )
 
 
-def run_phase(
+def _agentic_loop(
     phase_number: int,
     company_name: str,
     prior_verdicts: Optional[list] = None,
-) -> PhaseVerdict:
-    """Run one phase of the VC funnel against a company name.
+) -> tuple:
+    """Run one phase's tool-use loop until Claude calls submit_verdict.
 
-    prior_verdicts: PhaseVerdict objects from earlier phases in this run, passed
-    through so a later phase (e.g. Phase 3, pure reasoning) can cite their
-    findings instead of re-searching from scratch.
-
-    Loops until Claude calls submit_verdict, then saves the full run to data/runs/.
+    Returns (verdict_input, tool_calls_log, accumulated_usage, messages). Does
+    NOT save to disk or wrap in a PhaseVerdict — callers do that, so that Phase 3
+    can run this once to get the rubric, then separately run (and re-run) the
+    bull/bear/synthesizer debate on top of it without re-doing the rubric pass.
     """
     sdk_client = anthropic.Anthropic()
     tools = _connector_tools(phase_number)
     system_prompt = PHASE_PROMPTS[phase_number]   # KeyError until prompts.py is filled in
-    run_id = str(uuid.uuid4())[:8]
 
     messages: list = [
         {"role": "user", "content": _initial_message(company_name, prior_verdicts)}
@@ -277,16 +277,115 @@ def run_phase(
         if tool_results:
             messages.append({"role": "user", "content": tool_results})
 
-    verdict = PhaseVerdict(
+    return verdict_input, tool_calls_log, accumulated_usage, messages
+
+
+def _build_verdict(
+    phase_number: int,
+    company_name: str,
+    verdict_input: dict,
+    tool_calls_log: list,
+    accumulated_usage: dict,
+    debate: Optional[dict] = None,
+) -> PhaseVerdict:
+    return PhaseVerdict(
         company=company_name,
         phase=phase_number,
         verdict=verdict_input["verdict"],
         rationale=verdict_input["rationale"],
         confidence=float(verdict_input.get("confidence", 0.0)),
         tool_calls=tool_calls_log,
-        run_id=run_id,
+        run_id=str(uuid.uuid4())[:8],
         timestamp=datetime.now(timezone.utc).isoformat(),
         usage=accumulated_usage,
+        debate=debate,
     )
+
+
+def _combine_rubric_and_debate(rubric_text: str, debate_result) -> str:
+    """Fold the bull/bear/synthesizer debate transcript and synthesis onto the
+    Phase 3a rubric, so the combined text is a complete, human-readable record
+    and so later phases (via prior_verdicts) see the full reasoning trail."""
+    sep = "=" * 70
+    transcript_text = "\n\n".join(
+        f"--- {t.role.upper().replace('_', ' ')} ---\n{t.text}"
+        for t in debate_result.transcript
+    )
+    resolving = (
+        f"Resolving question: {debate_result.resolving_question}\n"
+        if not debate_result.converged else ""
+    )
+    return (
+        f"{rubric_text}\n\n"
+        f"{sep}\nBULL/BEAR/SYNTHESIZER DEBATE\n{sep}\n\n"
+        f"{transcript_text}\n\n"
+        f"--- SYNTHESIS ---\n"
+        f"Converged: {debate_result.converged}\n"
+        f"Convergence summary: {debate_result.convergence_summary}\n"
+        f"{resolving}\n"
+        f"{debate_result.rationale}"
+    )
+
+
+def run_phase3_rubric_only(
+    company_name: str,
+    prior_verdicts: Optional[list] = None,
+) -> PhaseVerdict:
+    """Run Phase 3's structured-reasoning rubric (3a) WITHOUT the bull/bear/
+    synthesizer debate (3b). Used internally by run_phase(3, ...), and directly
+    by experiments that need to hold the rubric fixed while re-running the
+    debate multiple times (debate stochasticity vs. rubric stochasticity)."""
+    verdict_input, tool_calls_log, accumulated_usage, messages = _agentic_loop(
+        3, company_name, prior_verdicts
+    )
+    verdict = _build_verdict(3, company_name, verdict_input, tool_calls_log, accumulated_usage)
+    _save_run(verdict, messages)
+    return verdict
+
+
+def run_phase(
+    phase_number: int,
+    company_name: str,
+    prior_verdicts: Optional[list] = None,
+) -> PhaseVerdict:
+    """Run one phase of the VC funnel against a company name.
+
+    prior_verdicts: PhaseVerdict objects from earlier phases in this run, passed
+    through so a later phase (e.g. Phase 3, pure reasoning) can cite their
+    findings instead of re-searching from scratch.
+
+    Phase 3 is special: it runs the 3a rubric, then wraps it in the 3b
+    bull/bear/synthesizer debate, and the debate's synthesized verdict becomes
+    Phase 3's final verdict.
+    """
+    if phase_number == 3:
+        rubric_verdict = run_phase3_rubric_only(company_name, prior_verdicts)
+
+        from orchestrator.debate import run_debate
+        debate_result = run_debate(company_name, rubric_verdict.rationale)
+
+        combined_usage = {
+            k: rubric_verdict.usage[k] + debate_result.usage[k]
+            for k in rubric_verdict.usage
+        }
+        verdict = PhaseVerdict(
+            company=company_name,
+            phase=3,
+            verdict=debate_result.verdict,
+            rationale=_combine_rubric_and_debate(rubric_verdict.rationale, debate_result),
+            confidence=debate_result.confidence,
+            tool_calls=rubric_verdict.tool_calls,
+            run_id=str(uuid.uuid4())[:8],
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            usage=combined_usage,
+            debate=debate_result.to_dict(),
+        )
+        _save_run(verdict, [])   # raw messages already saved by run_phase3_rubric_only
+        return verdict
+
+    verdict_input, tool_calls_log, accumulated_usage, messages = _agentic_loop(
+        phase_number, company_name, prior_verdicts
+    )
+    verdict = _build_verdict(phase_number, company_name, verdict_input, tool_calls_log, accumulated_usage)
     _save_run(verdict, messages)
     return verdict

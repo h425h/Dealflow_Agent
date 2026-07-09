@@ -9,9 +9,9 @@ one. Keep entries short — this is a log, not documentation. Newest entry on to
 
 **Milestone 3: Phases 2–4 + evals + memo.** Eval harness (`evals/connector_evals.py`,
 `evals/phase_evals.py`) is now built and passing — see Eval fixtures and Known
-Limitations below. Phase 2 (screening) and Phase 3a (preliminary eval — structured
-reasoning rubric) are built. Remaining M3 work: Phase 3b (bull/bear/synthesizer
-debate), Phase 4 (deep diligence), EDGAR/USPTO connectors, `memo/generator.py`.
+Limitations below. Phase 2 (screening), Phase 3a (structured reasoning rubric), and
+Phase 3b (bull/bear/synthesizer debate) are built. Remaining M3 work: Phase 4 (deep
+diligence), EDGAR/USPTO connectors, `memo/generator.py`.
 
 `docs/phase-tests.md` is now the authoritative per-phase diligence test spec.
 Read it alongside `docs/source-paper.md` before writing any phase logic or prompt.
@@ -35,8 +35,12 @@ Read it alongside `docs/source-paper.md` before writing any phase logic or promp
   - **3a (built)**: Six Pensées, Seven Deadly Questions, operationalized
     labor-replacement test, Clone Test — structured rubric, pure reasoning over
     Phase 1-2 findings, one optional gap-filling search, DATA-BLIND honesty rule.
-  - **3b (not started)**: bull/bear/synthesizer debate wrapped around the 3a
-    rubric — deliberately deferred until 3a's reasoning quality is verified.
+  - **3b (built)**: bull/bear/synthesizer debate wrapped around the 3a rubric.
+    2 rounds max (bull opening → bear opening → bull rebuttal → bear rebuttal),
+    then a mandatory synthesized verdict. See session log for the Abridge/
+    Chatbase experiment and an honest report on whether it resolved the
+    boundary-case instability it was predicted to fix — short answer: not the
+    way predicted, see below.
 - Phase 4 (deep diligence): IP defensibility, scientific/technical moat, data-moat
   scoring, unit economics (when financials supplied), regulatory barriers
 - `evals/connector_evals.py`, `evals/phase_evals.py`
@@ -89,6 +93,44 @@ Read it alongside `docs/source-paper.md` before writing any phase logic or promp
   prediction that Phase 3's bull/bear debate (built for exactly this kind of
   boundary disagreement) is the right structural fix, rather than a symptom of
   an unreliable pipeline that needs fixing elsewhere.
+  **PREDICTION TEST RESULT (2026-07-09, Phase 3b built and run against Abridge
+  3x): the prediction did NOT hold as stated — reporting honestly.** Ran a
+  fresh Phase 1 → 2 → 3a pipeline once (Phase 1 landed KILL/0.82 this time,
+  one of the two historical branches), then ran the Phase 3b debate 3
+  independent times on the SAME fixed Phase 3a rubric. All 3 runs CONVERGED on
+  KILL: confidence 0.92, 0.85, 0.82, `converged=true` every time. No run
+  produced needs-more-info or a named resolving question. The Chatbase control
+  (clear thin-wrapper case) also converged decisively — KILL/0.88 — confirming
+  the mechanism isn't just hedging by default; it can and does converge when
+  warranted. So the debate mechanism itself worked exactly as designed
+  (bull/bear genuinely engaged each other's specific claims — e.g. a real
+  exchange over whether the bear's conjunction-fallacy probabilities were
+  independent or correlated — and the synthesizer correctly distinguished
+  "reasonable people could spin this differently" from "there's a specific
+  fact that would resolve this," finding none of the latter). **What actually
+  happened:** Phase 3a's structured rubric, by forcing the operationalized
+  labor-replacement test to reason explicitly step-by-step through the
+  workflow, resolved Abridge's core ambiguity BEFORE the debate ever started —
+  it concluded "the physician's signature is legally required... not a
+  product design choice Abridge can unilaterally change" in plain, unhedged
+  language. That's a clean factual conclusion, not a judgment call, so there
+  was nothing substantive left for bull and bear to genuinely disagree about;
+  the "instability" that showed up at Phase 1 was a symptom of thin,
+  unsynthesized search results forcing a snap judgment, not evidence of a
+  deep, irreducible thesis tension. Phase 3a's explicit-reasoning requirement
+  turned out to be the fix, one step earlier in the funnel than predicted —
+  Phase 3b then correctly confirmed a question that was already settled,
+  rather than adjudicating one that was genuinely open. Two honest caveats:
+  (1) this treatment used exactly one fresh Phase 1/2 run, which happened to
+  draw the KILL branch of Phase 1's own historical instability — whether a
+  NEEDS-MORE-INFO-branch Phase 1 run would produce a Phase 3a rubric with real
+  residual tension (and therefore a genuinely non-convergent debate) is
+  untested; (2) with zero non-convergent runs observed anywhere yet, the
+  "distinguish structural from substantive disagreement" logic in the
+  synthesizer prompt is unverified on a true positive — it's only been shown
+  to correctly avoid false positives (Abridge, Chatbase). Finding a case that
+  actually produces `converged=false` with a named resolving question is the
+  next real test of that logic, not yet done.
 - **Eval gap: no fixture tests "github_search correctly included."** All 6 companies
   in the current Phase 1 fixture batch (Slang.ai, Chatbase, Glean, Rogo, Abridge,
   EvenUp) are closed-source enterprise SaaS, so the agent correctly skipped
@@ -150,7 +192,7 @@ checked items are actually done (not "mostly done").
 - [ ] `connectors/uspto_connector.py`
 - [x] Phase 2 (screening) implemented
 - [x] Phase 3a (preliminary eval — structured reasoning rubric) implemented
-- [ ] Phase 3b (bull/bear/synthesizer debate) implemented
+- [x] Phase 3b (bull/bear/synthesizer debate) implemented
 - [ ] Phase 4 (deep diligence) implemented
 - [x] Human-in-the-loop checkpoint between every phase in `cli/run.py` (Phase 1 →
       2 → 3 gates built; will extend as Phase 4 lands)
@@ -178,6 +220,78 @@ Add a short entry each session. Format:
 - What broke / open questions
 - What's next
 ```
+
+### 2026-07-09 (session 7)
+- Built Phase 3b: the bull/bear/synthesizer debate, designed against two named
+  failure modes — degeneration of thought (agents entrenching/restating) and
+  shared-bias reinforcement (debate just confirming the same conclusion from
+  both sides).
+- `orchestrator/prompts.py` `DEBATE_PROMPTS`: bull, bear, synthesizer system
+  prompts. Bull/bear each get exactly 2 turns (opening + rebuttal) and are
+  explicitly instructed to engage the other side's SPECIFIC claims in
+  rebuttal, not restate their opening case; both are told to steelman the
+  other side's strongest point before countering it. Bear's opening case
+  mandates the conjunction-fallacy check from `docs/phase-tests.md` — enumerate
+  the company-specific chain of required-to-succeed conditions, assign rough
+  probabilities, reason about JOINT (not isolated) probability. Synthesizer
+  prompt is the core design bet: it must always return a verdict (no "it
+  depends"), and must explicitly distinguish STRUCTURAL disagreement (bull and
+  bear disagree by construction; one argument is just stronger on the merits →
+  converge on it) from SUBSTANTIVE non-convergence (a real unresolved question
+  exists AND a specific resolving question can be named → needs-more-info,
+  low confidence). The test built into the prompt: if the synthesizer can't
+  name a concrete resolving question, the disagreement was structural, not
+  substantive, and it must converge.
+- `orchestrator/debate.py` (new): `run_debate(company_name, phase3_rubric)` —
+  2 rounds max, hard cap, no tool calls anywhere in the debate (bull/bear see
+  only the Phase 3a rubric text, no new searches). Each of the 3 roles gets
+  its own cached system prompt (`cache_control: ephemeral`); confirmed this is
+  "the most expensive phase" as flagged — full experiment below cost $0.75 for
+  4 debates + 3 supporting phase runs. `submit_debate_verdict` tool requires
+  verdict/confidence/converged/convergence_summary/resolving_question/rationale
+  every time; one nudge-retry if the model responds without calling it, then a
+  visibly-flagged system-failure fallback (never silently defaults).
+- `orchestrator/agent.py`: refactored the phase tool-use loop out into
+  `_agentic_loop()` so Phase 3's rubric pass and the debate can be run and
+  re-run independently (needed for the experiment: hold the rubric fixed,
+  vary the debate). Added `run_phase3_rubric_only()` (3a alone, no debate) and
+  made `run_phase(3, ...)` internally: run 3a → run 3b on its output → the
+  debate's synthesized verdict/confidence/rationale becomes Phase 3's final
+  verdict. `PhaseVerdict` gained an optional `debate` field (full transcript +
+  synthesis, Phase 3 only) that's both saved to disk and folded into the
+  printed rationale, so `cli/run.py` needed no new UI beyond a 2-line
+  converged/resolving-question summary.
+- `config.py`: extracted the per-million-token pricing math out of
+  `cli/run.py` into `config.estimate_cost()` so the experiment script (and any
+  future caller) doesn't duplicate the formula.
+- **Ran the two specified conditions.** TREATMENT (Abridge): fresh Phase 1 →
+  Phase 2 → Phase 3a rubric (once), then the Phase 3b debate run 3 independent
+  times on that SAME fixed rubric. CONTROL (Chatbase): reused the existing
+  saved Phase 1/2 runs from session 5, ran Phase 3 (rubric + debate) once.
+- **Honest result — the specific prediction in Known Limitations did NOT hold
+  as stated.** All 3 Abridge debate runs CONVERGED on KILL (confidence 0.92,
+  0.85, 0.82) — none produced needs-more-info or a named resolving question.
+  Chatbase converged on KILL/0.88, confirming the mechanism converges when
+  warranted rather than always hedging. Full breakdown and reasoning for why
+  the prediction missed (Phase 3a's explicit workflow-step reasoning resolved
+  Abridge's core ambiguity a step earlier than expected, leaving nothing
+  substantive for the debate to disagree about) is written up in the Known
+  Limitations entry above — not duplicating it here. Two open follow-ups
+  flagged there: untested whether a NEEDS-MORE-INFO-branch Phase 1 run would
+  produce a genuinely tense Phase 3a rubric, and the synthesizer's structural-
+  vs-substantive logic has zero true-positive verification (no run has yet
+  produced `converged=false`).
+- Full transcripts saved: `data/runs/abridge_phase3debate_*.json` (3 files),
+  `data/runs/chatbase_phase3debate_*.json`, plus the combined Phase 3 records
+  (`abridge_phase3_2cb019cf.json`, `chatbase_phase3_*.json`).
+- Cost: abridge_phase1 $0.0427, abridge_phase2 $0.0385, abridge_phase3_rubric
+  $0.0605, 3× abridge debate $0.1377/$0.1413/$0.1423, chatbase Phase 3
+  (rubric+debate combined) $0.1914. Total: $0.7544.
+- What's next: Phase 4 (deep diligence) and EDGAR/USPTO connectors are the
+  remaining M3 items. Also worth a future session: deliberately construct or
+  find a company whose Phase 3a rubric contains genuine residual tension, to
+  verify the synthesizer's non-convergence path actually fires correctly
+  rather than just correctly avoiding false positives.
 
 ### 2026-07-09 (session 6)
 - Built Phase 3a (preliminary evaluation, structured reasoning rubric only —

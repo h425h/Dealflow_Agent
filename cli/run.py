@@ -10,11 +10,7 @@ from orchestrator.agent import run_phase
 
 def print_verdict(verdict) -> None:
     u = verdict.usage
-    input_cost = u["input_tokens"] * 3 / 1_000_000
-    output_cost = u["output_tokens"] * 15 / 1_000_000
-    cache_write_cost = u["cache_creation_input_tokens"] * 3.75 / 1_000_000
-    cache_read_cost = u["cache_read_input_tokens"] * 0.30 / 1_000_000
-    total_cost = input_cost + output_cost + cache_write_cost + cache_read_cost
+    total_cost = config.estimate_cost(u)
 
     print("=" * 60)
     print(f"PHASE:      {verdict.phase}")
@@ -24,6 +20,13 @@ def print_verdict(verdict) -> None:
     print("-" * 60)
     print("RATIONALE:")
     print(verdict.rationale)
+    if verdict.debate:
+        d = verdict.debate
+        print("-" * 60)
+        print("DEBATE SYNTHESIS:")
+        print(f"  converged:         {d['converged']}")
+        if not d["converged"]:
+            print(f"  resolving question: {d['resolving_question']}")
     print("-" * 60)
     print(f"TOOLS CALLED ({len(verdict.tool_calls)}):")
     for tc in verdict.tool_calls:
