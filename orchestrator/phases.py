@@ -31,5 +31,14 @@ PHASE_DEFINITIONS: dict[int, PhaseDefinition] = {
         # runs off Tavily (pricing pages, careers pages, news).
         connectors=[TavilyConnector(), ArxivConnector(), GitHubConnector()],
     ),
-    # Phases 3-4 added later in Milestone 3.
+    3: PhaseDefinition(
+        number=3,
+        name="preliminary_evaluation",
+        # Per docs/phase-tests.md, Phase 3 is PURE REASONING over what Phases 1-2
+        # already gathered — no new connector types. One Tavily connector is wired
+        # in only to allow a single optional gap-filling search (capped at 1 in the
+        # Phase 3 prompt); it is not a research phase.
+        connectors=[TavilyConnector()],
+    ),
+    # Phase 4 added later in Milestone 3.
 }

@@ -129,6 +129,27 @@ def _serialize_messages(messages: list) -> list:
     return out
 
 
+def _initial_message(company_name: str, prior_verdicts: Optional[list] = None) -> str:
+    """Build the first user message. Phases 2+ may pass prior verdicts so a later
+    phase (e.g. Phase 3, which reasons over earlier findings instead of re-searching)
+    has the actual evidence and rationale to work from."""
+    if not prior_verdicts:
+        return f"Company to evaluate: {company_name}"
+
+    lines = [f"Company to evaluate: {company_name}", "", "Findings from prior phases:"]
+    for v in prior_verdicts:
+        lines.append(f"\n--- Phase {v.phase} ---")
+        lines.append(f"Verdict: {v.verdict} (confidence {v.confidence:.2f})")
+        lines.append("Rationale:")
+        lines.append(v.rationale)
+        searches = [tc for tc in v.tool_calls if tc["tool"] != "submit_verdict"]
+        if searches:
+            lines.append("Searches run:")
+            for tc in searches:
+                lines.append(f"  - {tc['tool']}({tc['input'].get('query', '')!r})")
+    return "\n".join(lines)
+
+
 def _save_run(verdict: PhaseVerdict, messages: list) -> None:
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     safe = verdict.company.lower().replace(" ", "_").replace("/", "_")
@@ -153,8 +174,16 @@ def _save_run(verdict: PhaseVerdict, messages: list) -> None:
     )
 
 
-def run_phase(phase_number: int, company_name: str) -> PhaseVerdict:
+def run_phase(
+    phase_number: int,
+    company_name: str,
+    prior_verdicts: Optional[list] = None,
+) -> PhaseVerdict:
     """Run one phase of the VC funnel against a company name.
+
+    prior_verdicts: PhaseVerdict objects from earlier phases in this run, passed
+    through so a later phase (e.g. Phase 3, pure reasoning) can cite their
+    findings instead of re-searching from scratch.
 
     Loops until Claude calls submit_verdict, then saves the full run to data/runs/.
     """
@@ -164,7 +193,7 @@ def run_phase(phase_number: int, company_name: str) -> PhaseVerdict:
     run_id = str(uuid.uuid4())[:8]
 
     messages: list = [
-        {"role": "user", "content": f"Company to evaluate: {company_name}"}
+        {"role": "user", "content": _initial_message(company_name, prior_verdicts)}
     ]
     tool_calls_log: list = []
     verdict_input: Optional[dict] = None

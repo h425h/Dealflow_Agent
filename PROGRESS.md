@@ -9,8 +9,9 @@ one. Keep entries short — this is a log, not documentation. Newest entry on to
 
 **Milestone 3: Phases 2–4 + evals + memo.** Eval harness (`evals/connector_evals.py`,
 `evals/phase_evals.py`) is now built and passing — see Eval fixtures and Known
-Limitations below. Remaining M3 work: Phase 2 (screening), Phase 3 (preliminary
-eval), Phase 4 (deep diligence), EDGAR/USPTO connectors, `memo/generator.py`.
+Limitations below. Phase 2 (screening) and Phase 3a (preliminary eval — structured
+reasoning rubric) are built. Remaining M3 work: Phase 3b (bull/bear/synthesizer
+debate), Phase 4 (deep diligence), EDGAR/USPTO connectors, `memo/generator.py`.
 
 `docs/phase-tests.md` is now the authoritative per-phase diligence test spec.
 Read it alongside `docs/source-paper.md` before writing any phase logic or prompt.
@@ -30,8 +31,12 @@ Read it alongside `docs/source-paper.md` before writing any phase logic or promp
 - `connectors/edgar_connector.py` — SEC EDGAR (fund-fit / stage checks, public financials)
 - `connectors/uspto_connector.py` — USPTO PatentsView (IP defensibility for Phase 4)
 - Phase 2 (screening): pricing-model classifier, fund-fit/stage check, hiring-signal read
-- Phase 3 (preliminary eval): Six Pensées, Seven Deadly Questions, operationalized
-  labor-replacement test, Clone Test — pure reasoning, no new connectors
+- Phase 3 (preliminary eval), split into two builds:
+  - **3a (built)**: Six Pensées, Seven Deadly Questions, operationalized
+    labor-replacement test, Clone Test — structured rubric, pure reasoning over
+    Phase 1-2 findings, one optional gap-filling search, DATA-BLIND honesty rule.
+  - **3b (not started)**: bull/bear/synthesizer debate wrapped around the 3a
+    rubric — deliberately deferred until 3a's reasoning quality is verified.
 - Phase 4 (deep diligence): IP defensibility, scientific/technical moat, data-moat
   scoring, unit economics (when financials supplied), regulatory barriers
 - `evals/connector_evals.py`, `evals/phase_evals.py`
@@ -144,10 +149,11 @@ checked items are actually done (not "mostly done").
 - [ ] `connectors/edgar_connector.py`
 - [ ] `connectors/uspto_connector.py`
 - [x] Phase 2 (screening) implemented
-- [ ] Phase 3 (preliminary eval — no connectors, pure reasoning) implemented
+- [x] Phase 3a (preliminary eval — structured reasoning rubric) implemented
+- [ ] Phase 3b (bull/bear/synthesizer debate) implemented
 - [ ] Phase 4 (deep diligence) implemented
 - [x] Human-in-the-loop checkpoint between every phase in `cli/run.py` (Phase 1 →
-      Phase 2 gate built; will extend as Phases 3/4 land)
+      2 → 3 gates built; will extend as Phase 4 lands)
 - [x] `evals/connector_evals.py` — at least one eval per connector
 - [x] `evals/phase_evals.py` — at least one eval per phase
 - [ ] `memo/generator.py` — full run → IC-style memo, including "cannot determine" section
@@ -172,6 +178,52 @@ Add a short entry each session. Format:
 - What broke / open questions
 - What's next
 ```
+
+### 2026-07-09 (session 6)
+- Built Phase 3a (preliminary evaluation, structured reasoning rubric only —
+  the bull/bear/synthesizer debate is Phase 3b, deliberately deferred to a
+  separate task so reasoning quality could be verified before wrapping
+  multi-agent orchestration around it).
+- `orchestrator/phases.py` PHASE_DEFINITIONS[3]: connectors=[TavilyConnector()]
+  only — no new connector types, matching the spec's "pure reasoning" framing.
+  One Tavily connector is wired in solely to allow a single optional
+  gap-filling search (enforced via prompt instruction, same pattern as the
+  Phase 1/2 search caps).
+- **Infrastructure change required and made:** Phase 3 needs to reason over
+  "what Phases 1-2 gathered," but `run_phase()` previously started every phase
+  from a blank slate (just the company name) — there was no mechanism to pass
+  earlier verdicts forward. Added `prior_verdicts` param to `run_phase()` and
+  `orchestrator/agent.py::_initial_message()`, which folds prior phases'
+  verdict/confidence/rationale/search-history into the first user message.
+  Scoped narrowly: only Phase 3+ receives prior context (`cli/run.py` only
+  passes `prior_verdicts` when `phase >= 3`), so Phase 1/2 behavior and
+  existing eval fixtures are unaffected.
+- `orchestrator/prompts.py` PHASE_PROMPTS[3]: full rubric — Six Pensées, Seven
+  Deadly Questions, Clone Test, operationalized labor-replacement test. Hard
+  honesty rule: every field must cite evidence or say exactly "DATA-BLIND:
+  cannot determine from public sources"; explicitly forbids inventing capital
+  figures, valuations, TAM, or named advisors without a direct public source.
+  Same verdict enum/humility statement/weighted scoring as Phases 1-2; capped
+  at 1 optional tavily_search (vs. 4 for Phases 1-2) since this phase reasons,
+  it doesn't gather.
+- `cli/run.py`: generalized the phase loop (`LAST_PHASE = 3`) instead of
+  hand-writing each phase transition; added the Phase 2 → Phase 3 checkpoint
+  on the same input()-based advance/kill/dig-deeper pattern.
+- **Ran the full Phase 1 → 2 → 3 pipeline on Slang.ai:** ADVANCE (0.68) →
+  advance → ADVANCE (0.75) → advance → ADVANCE (0.72). Phase 3 used exactly 1
+  search (founder background) + submit_verdict — respected the cap. Correctly
+  flagged DATA-BLIND on capital needed, valuation, and advisors/consultants
+  (no public source for any of them). Clone Test answer was appropriately
+  qualified ("credible but fragile" — integration lock-in + accumulated call
+  data, but OpenTable/SevenRooms could build native competition). Labor-
+  replacement test resolved cleanly to "yes, for the phone-answering/
+  reservationist role specifically." Verdict surfaced a genuine new finding
+  Phases 1-2 missed: Slang.ai is at Series B (~$68M raised), which is a stage
+  mismatch for an early-stage thesis — flagged as a fund-mandate-dependent
+  caveat rather than papered over. Cost: $0.0428 (P1) + $0.0393 (P2) + $0.0752
+  (P3) = $0.1573 total. Full trace: `data/runs/slang.ai_phase3_b3ee319e.json`.
+- What's next: Phase 3b (bull/bear/synthesizer debate) once reasoning quality
+  above is judged sufficient; then Phase 4 (deep diligence) and EDGAR/USPTO.
 
 ### 2026-07-09 (session 5)
 - Added a testable prediction to the Abridge Known Limitations entry: the

@@ -57,34 +57,48 @@ def checkpoint(company: str, verdict) -> str:
         print("Please type exactly one of: advance, kill, dig-deeper")
 
 
+LAST_PHASE = 3   # highest phase currently implemented
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run a deal-flow phase against a company.")
     parser.add_argument("company", help="Company name to evaluate")
     parser.add_argument(
         "--phase", type=int, default=1,
-        help="Phase to start at (default: 1). Starting at 2 skips the Phase 1 checkpoint.",
+        help=(
+            "Phase to start at (default: 1). Starting above 1 skips earlier "
+            "checkpoints and does not pass earlier-phase context."
+        ),
     )
     args = parser.parse_args()
 
     print(f"\nModel: {config.MODEL}")
 
-    if args.phase == 1:
-        print(f"Running Phase 1 on: {args.company}\n")
-        verdict = run_phase(1, args.company)
-        print_verdict(verdict)
-
-        decision = checkpoint(args.company, verdict)
-        if decision != "advance":
-            print(f"\nHuman decision: {decision}. Stopping before Phase 2.")
-            return
-
-        print(f"\nRunning Phase 2 on: {args.company}\n")
-        verdict = run_phase(2, args.company)
-        print_verdict(verdict)
-    else:
+    if args.phase != 1:
         print(f"Running Phase {args.phase} on: {args.company}\n")
         verdict = run_phase(args.phase, args.company)
         print_verdict(verdict)
+        return
+
+    prior_verdicts: list = []
+    for phase in range(1, LAST_PHASE + 1):
+        print(f"\nRunning Phase {phase} on: {args.company}\n")
+        # Phase 3+ reasons over prior-phase findings instead of re-searching;
+        # Phases 1-2 are independent research passes, so don't feed them prior context.
+        verdict = run_phase(
+            phase, args.company,
+            prior_verdicts=prior_verdicts if phase >= 3 else None,
+        )
+        print_verdict(verdict)
+        prior_verdicts.append(verdict)
+
+        if phase == LAST_PHASE:
+            break
+
+        decision = checkpoint(args.company, verdict)
+        if decision != "advance":
+            print(f"\nHuman decision: {decision}. Stopping before Phase {phase + 1}.")
+            return
 
 
 if __name__ == "__main__":
