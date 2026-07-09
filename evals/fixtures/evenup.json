@@ -1,0 +1,64 @@
+{
+  "run_id": "4cbe44b3",
+  "company": "EvenUp",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:06:38.336909+00:00",
+  "expected_verdict": "advance",
+  "verdict": "needs-more-info",
+  "confidence": 0.5,
+  "rationale": "**What the searches returned:** EvenUp is a vertical AI platform squarely targeting personal injury (PI) law firms \u2014 producing demand letters, medical chronologies, and case analysis via its \"Piai\" model (self-described as \"the largest dataset in personal injury\"). Their new PLAAS (Pre-Litigation as a Service) product explicitly frames the offering as outsourcing the entire pre-litigation operational workload from law firms. **Belief B (Vertical Depth) \u2014 Strong.** PI law is a well-defined vertical, EvenUp owns a proprietary PI-specific training corpus unavailable to general models, and they have clear distribution lock-in through named enterprise clients (e.g. Lerner & Rowe). **Belief A (Labor Replacement) \u2014 Mixed/Ambiguous.** PLAAS language (\"outsource any or all operational work\") is directionally replacement-positive, but EvenUp's own blog explicitly states \"relying solely on AI for demands can be borderline malpractice\" and a competitor's comparison confirms EvenUp \"relies on a mix of AI and human drafters.\" This is the critical unresolved question: is the human reviewer inside EvenUp's own operation (making it an AI-powered outsourcing service that removes labor from the law firm's headcount \u2014 still replacement from the client's perspective) or is the attorney still reviewing before the output ships? Public signal is insufficient to definitively resolve this. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "EvenUp AI legal demand letters pricing product"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.710564292,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "EvenUp AI personal injury legal documents automation"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "EvenUp PLAAS \"pre-litigation as a service\" human review labor replacement per demand pricing"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.643921312,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "needs-more-info",
+        "rationale": "**What the searches returned:** EvenUp is a vertical AI platform squarely targeting personal injury (PI) law firms \u2014 producing demand letters, medical chronologies, and case analysis via its \"Piai\" model (self-described as \"the largest dataset in personal injury\"). Their new PLAAS (Pre-Litigation as a Service) product explicitly frames the offering as outsourcing the entire pre-litigation operational workload from law firms. **Belief B (Vertical Depth) \u2014 Strong.** PI law is a well-defined vertical, EvenUp owns a proprietary PI-specific training corpus unavailable to general models, and they have clear distribution lock-in through named enterprise clients (e.g. Lerner & Rowe). **Belief A (Labor Replacement) \u2014 Mixed/Ambiguous.** PLAAS language (\"outsource any or all operational work\") is directionally replacement-positive, but EvenUp's own blog explicitly states \"relying solely on AI for demands can be borderline malpractice\" and a competitor's comparison confirms EvenUp \"relies on a mix of AI and human drafters.\" This is the critical unresolved question: is the human reviewer inside EvenUp's own operation (making it an AI-powered outsourcing service that removes labor from the law firm's headcount \u2014 still replacement from the client's perspective) or is the attorney still reviewing before the output ships? Public signal is insufficient to definitively resolve this. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.5
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 7081,
+    "output_tokens": 753,
+    "cache_creation_input_tokens": 2583,
+    "cache_read_input_tokens": 5166
+  },
+  "cost_usd": 0.043774
+}

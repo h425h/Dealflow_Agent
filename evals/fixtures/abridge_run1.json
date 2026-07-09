@@ -1,0 +1,64 @@
+{
+  "run_id": "542df80d",
+  "company": "Abridge",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:08:15.987787+00:00",
+  "expected_verdict": null,
+  "verdict": "kill",
+  "confidence": 0.78,
+  "rationale": "**Belief A (Labor Replacement) \u2014 WEAK/DISQUALIFYING.** Abridge is framed consistently as an ambient AI scribe that produces *draft* documentation \u2014 \"natural conversations, turned into draft documentation\" and \"clinically useful and billable AI notes at the point of care.\" The product converts physician-patient conversations into structured draft notes that flow into the EHR; however, a physician still reviews, edits, and signs off on every note before it ships. This is a canonical augmentation pattern: the AI accelerates the documentation task but the clinician remains the agent of record. The human has not been removed from the loop \u2014 they are just faster. This directly triggers the augmentation disqualifier. **Belief B (Vertical Depth) \u2014 STRONG.** Abridge is deeply embedded in healthcare specifically: Epic \"First Pal\" status, deployment at Mayo Clinic, Duke, Johns Hopkins, Kaiser Permanente, 250+ health systems, consecutive KLAS #1 awards, and $800M+ raised. The vertical moat and distribution are real. However, per thesis rules, strong Belief B cannot rescue a company that is clearly augmentation, not replacement. The human physician touch-review before note signature is the critical disqualifying fact. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI medical documentation pricing product"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.6783302,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "Abridge AI clinical documentation healthcare NLP"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI ambient scribe replaces human documentation physician workflow Epic EHR"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.6839329860000001,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "kill",
+        "rationale": "**Belief A (Labor Replacement) \u2014 WEAK/DISQUALIFYING.** Abridge is framed consistently as an ambient AI scribe that produces *draft* documentation \u2014 \"natural conversations, turned into draft documentation\" and \"clinically useful and billable AI notes at the point of care.\" The product converts physician-patient conversations into structured draft notes that flow into the EHR; however, a physician still reviews, edits, and signs off on every note before it ships. This is a canonical augmentation pattern: the AI accelerates the documentation task but the clinician remains the agent of record. The human has not been removed from the loop \u2014 they are just faster. This directly triggers the augmentation disqualifier. **Belief B (Vertical Depth) \u2014 STRONG.** Abridge is deeply embedded in healthcare specifically: Epic \"First Pal\" status, deployment at Mayo Clinic, Duke, Johns Hopkins, Kaiser Permanente, 250+ health systems, consecutive KLAS #1 awards, and $800M+ raised. The vertical moat and distribution are real. However, per thesis rules, strong Belief B cannot rescue a company that is clearly augmentation, not replacement. The human physician touch-review before note signature is the critical disqualifying fact. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.78
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 6957,
+    "output_tokens": 686,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 7749
+  },
+  "cost_usd": 0.033486
+}

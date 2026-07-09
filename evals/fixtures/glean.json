@@ -1,0 +1,64 @@
+{
+  "run_id": "fe2e90c2",
+  "company": "Glean",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:07:25.088278+00:00",
+  "expected_verdict": "kill",
+  "verdict": "kill",
+  "confidence": 0.85,
+  "rationale": "Glean is an enterprise AI search and assistant platform \u2014 a horizontal tool designed to help employees find information and execute tasks across any industry. It explicitly frames its value as augmentation: \"AI partner,\" \"AI coworker,\" \"moves employees from insight to execution,\" and a \"personal AI assistant.\" The human remains the agent of record; Glean surfaces, organizes, and assists but does not replace an end-to-end job function. This is a textbook augmentation play (Belief A: weak). It is also horizontal by design \u2014 250+ connectors across all enterprise software stacks with no vertical industry focus or proprietary domain-specific data moat (Belief B: absent). Both beliefs are clearly unmet. arXiv returned no Glean-specific technical work. This is a well-funded, horizontal enterprise-search/copilot product \u2014 out of scope for this thesis regardless of company quality. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Glean AI enterprise search product pricing"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.775139142,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "Glean enterprise AI search knowledge retrieval"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Glean AI work assistant autonomous agent replaces employees enterprise 2024"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.569812464,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "kill",
+        "rationale": "Glean is an enterprise AI search and assistant platform \u2014 a horizontal tool designed to help employees find information and execute tasks across any industry. It explicitly frames its value as augmentation: \"AI partner,\" \"AI coworker,\" \"moves employees from insight to execution,\" and a \"personal AI assistant.\" The human remains the agent of record; Glean surfaces, organizes, and assists but does not replace an end-to-end job function. This is a textbook augmentation play (Belief A: weak). It is also horizontal by design \u2014 250+ connectors across all enterprise software stacks with no vertical industry focus or proprietary domain-specific data moat (Belief B: absent). Both beliefs are clearly unmet. arXiv returned no Glean-specific technical work. This is a well-funded, horizontal enterprise-search/copilot product \u2014 out of scope for this thesis regardless of company quality. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.85
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 6482,
+    "output_tokens": 600,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 7749
+  },
+  "cost_usd": 0.030771
+}

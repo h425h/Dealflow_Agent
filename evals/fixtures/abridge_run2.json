@@ -1,0 +1,64 @@
+{
+  "run_id": "cffe6447",
+  "company": "Abridge",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:08:39.584163+00:00",
+  "expected_verdict": null,
+  "verdict": "kill",
+  "confidence": 0.75,
+  "rationale": "Abridge is a compelling, well-funded company (KLAS Market Leader, $150M Series C, 200+ health systems, UPMC deployment at 12,000 clinicians, Epic integration) with strong vertical depth in healthcare \u2014 Belief B is clearly satisfied. However, Belief A (labor replacement) fails the thesis test. Abridge's own product language (\"draft documentation,\" \"built for accuracy,\" \"review\") places the clinician firmly in the loop as the agent of record who reviews and signs off on AI-generated notes. This is the canonical augmentation pattern \u2014 the AI assists the physician in writing notes faster, but the human still reviews, corrects, and owns the output before it enters the EHR. It does not replace a discrete labor role end-to-end (e.g., routing a completed clinical note directly to the next workflow step without physician review). The company's framing as a \"scribe replacement\" is closer, but medical-legal requirements mean physician attestation is structurally required, making full labor replacement infeasible in this exact workflow. Belief A is structurally blocked, not merely underexecuted. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI healthcare product pricing labor replacement"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.5038500100000001,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "Abridge AI clinical documentation medical conversation"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI ambient clinical documentation replaces scribes human-in-the-loop EHR integration UPMC"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.7168905240000001,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "kill",
+        "rationale": "Abridge is a compelling, well-funded company (KLAS Market Leader, $150M Series C, 200+ health systems, UPMC deployment at 12,000 clinicians, Epic integration) with strong vertical depth in healthcare \u2014 Belief B is clearly satisfied. However, Belief A (labor replacement) fails the thesis test. Abridge's own product language (\"draft documentation,\" \"built for accuracy,\" \"review\") places the clinician firmly in the loop as the agent of record who reviews and signs off on AI-generated notes. This is the canonical augmentation pattern \u2014 the AI assists the physician in writing notes faster, but the human still reviews, corrects, and owns the output before it enters the EHR. It does not replace a discrete labor role end-to-end (e.g., routing a completed clinical note directly to the next workflow step without physician review). The company's framing as a \"scribe replacement\" is closer, but medical-legal requirements mean physician attestation is structurally required, making full labor replacement infeasible in this exact workflow. Belief A is structurally blocked, not merely underexecuted. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.75
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 7093,
+    "output_tokens": 661,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 7749
+  },
+  "cost_usd": 0.033519
+}

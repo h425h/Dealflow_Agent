@@ -1,0 +1,64 @@
+{
+  "run_id": "0b69a516",
+  "company": "Slang.ai",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:12:00.942631+00:00",
+  "expected_verdict": "advance",
+  "verdict": "advance",
+  "confidence": 0.72,
+  "rationale": "**Belief A (Labor Replacement) \u2014 Strong.** Slang.ai positions itself as \"The AI Superhost for Restaurants,\" explicitly stating it \"answers every inbound call, instantly responds to guest inquiries, and automatically manages reservations \u2013 24/7.\" This is end-to-end phone answering with no human in the loop for the core workflow (reservation intake, modification, cancellation). The output \u2014 a confirmed reservation \u2014 routes directly to the restaurant's reservation platform (OpenTable, SevenRooms, Yelp, Fishbowl) without a human reviewing it first. Pricing tiers ($399/mo Core plan) are subscription-based, not per-outcome, which is a mild caveat, but the value prop is clearly replacement of a front-desk/host labor function rather than augmentation. The one caveat: VIP/custom routing *does* send some calls to staff, indicating partial augmentation at the margins. **Belief B (Vertical Depth) \u2014 Strong.** Slang.ai is exclusively restaurant-focused with deep integrations into the restaurant reservation stack (OpenTable, SevenRooms, Yelp, Fishbowl). This is a narrow, specific wedge into hospitality workflow, and the data accumulated (guest call recordings, CSAT, reservation-level insights) is proprietary and vertical-specific. ArXiv returned no company-specific publications, so technical/founder research depth is unconfirmed from public data. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Slang.ai product pricing labor replacement AI"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.38726946,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "Slang.ai conversational AI restaurant phone answering"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Slang.ai restaurant AI phone agent replaces staff 24/7 reservations"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.7207950940000001,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "advance",
+        "rationale": "**Belief A (Labor Replacement) \u2014 Strong.** Slang.ai positions itself as \"The AI Superhost for Restaurants,\" explicitly stating it \"answers every inbound call, instantly responds to guest inquiries, and automatically manages reservations \u2013 24/7.\" This is end-to-end phone answering with no human in the loop for the core workflow (reservation intake, modification, cancellation). The output \u2014 a confirmed reservation \u2014 routes directly to the restaurant's reservation platform (OpenTable, SevenRooms, Yelp, Fishbowl) without a human reviewing it first. Pricing tiers ($399/mo Core plan) are subscription-based, not per-outcome, which is a mild caveat, but the value prop is clearly replacement of a front-desk/host labor function rather than augmentation. The one caveat: VIP/custom routing *does* send some calls to staff, indicating partial augmentation at the margins. **Belief B (Vertical Depth) \u2014 Strong.** Slang.ai is exclusively restaurant-focused with deep integrations into the restaurant reservation stack (OpenTable, SevenRooms, Yelp, Fishbowl). This is a narrow, specific wedge into hospitality workflow, and the data accumulated (guest call recordings, CSAT, reservation-level insights) is proprietary and vertical-specific. ArXiv returned no company-specific publications, so technical/founder research depth is unconfirmed from public data. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.72
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 6661,
+    "output_tokens": 733,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 7749
+  },
+  "cost_usd": 0.033303
+}

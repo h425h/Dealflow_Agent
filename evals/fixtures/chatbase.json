@@ -1,0 +1,63 @@
+{
+  "run_id": "34a2c383",
+  "company": "Chatbase",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:07:02.190910+00:00",
+  "expected_verdict": "kill",
+  "verdict": "kill",
+  "confidence": 0.85,
+  "rationale": "Chatbase is a horizontal, no-code AI chatbot builder that lets any business train a GPT-4-powered chatbot on its own documents (PDFs, FAQs, website content). It is explicitly described as a general-purpose platform targeting \"small teams that want a simple, knowledge-based support bot\" and is sold across all industries with no vertical focus. Belief B (vertical depth) fails clearly: there is no named vertical, no proprietary domain-specific data accumulation, and no industry-specific workflow embedding \u2014 it is a thin wrapper around frontier LLMs (GPT-4) that competes on ease-of-use and price, not domain depth. Belief A (labor replacement) is also weak: the product is described as a chatbot builder/copilot tool, and reviewers note it \"stops when credits run out\" and handles FAQ/support queries rather than end-to-end job replacement; the human team still owns the resolution loop. Two disqualifiers apply simultaneously: (1) horizontal tooling not anchored to a specific industry's workflow, and (2) thin foundation-model wrapper whose value prop is cost and convenience, not domain depth. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Chatbase AI product pricing workflow"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.511931134,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Chatbase chatbot builder what does it do labor replacement"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.441860692,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Chatbase.co industry vertical focus proprietary data moat"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.336688846,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "kill",
+        "rationale": "Chatbase is a horizontal, no-code AI chatbot builder that lets any business train a GPT-4-powered chatbot on its own documents (PDFs, FAQs, website content). It is explicitly described as a general-purpose platform targeting \"small teams that want a simple, knowledge-based support bot\" and is sold across all industries with no vertical focus. Belief B (vertical depth) fails clearly: there is no named vertical, no proprietary domain-specific data accumulation, and no industry-specific workflow embedding \u2014 it is a thin wrapper around frontier LLMs (GPT-4) that competes on ease-of-use and price, not domain depth. Belief A (labor replacement) is also weak: the product is described as a chatbot builder/copilot tool, and reviewers note it \"stops when credits run out\" and handles FAQ/support queries rather than end-to-end job replacement; the human team still owns the resolution loop. Two disqualifiers apply simultaneously: (1) horizontal tooling not anchored to a specific industry's workflow, and (2) thin foundation-model wrapper whose value prop is cost and convenience, not domain depth. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.85
+      }
+    }
+  ],
+  "tools_used": [
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 6273,
+    "output_tokens": 640,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 7749
+  },
+  "cost_usd": 0.030744
+}

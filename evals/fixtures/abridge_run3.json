@@ -1,0 +1,64 @@
+{
+  "run_id": "e434fcb1",
+  "company": "Abridge",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:09:09.241152+00:00",
+  "expected_verdict": null,
+  "verdict": "needs-more-info",
+  "confidence": 0.5,
+  "rationale": "**Belief B (Vertical Depth) \u2014 Strong.** Abridge is unambiguously healthcare-only: ambient AI clinical documentation deeply embedded in Epic (first Epic \"Pal\" partner), deployed at Mayo Clinic, Johns Hopkins, Kaiser Permanente, and 250+ health systems. It has proprietary clinical-conversation data at massive scale, KLAS Market Leader recognition two consecutive years, and $800M raised. The vertical moat signal is among the strongest possible at Phase 1.\n\n**Belief A (Labor Replacement) \u2014 Ambiguous; flagged for review.** The product converts physician-patient conversations into draft clinical notes, which materially replaces the work of a human medical scribe (a role that hospitals pay ~$20\u201330/hr). That is a genuine labor-replacement wedge. However, the Johns Hopkins deployment description explicitly describes output as a \"draft clinical note for providers\" \u2014 implying the physician still reviews and signs off before the note is finalized in the EHR. This is the canonical augmentation pattern (human is still the agent of record). Whether the physician review is substantive editing (augmentation) or a rubber-stamp sign-off after the AI does all the real work (functional replacement of the scribe role) cannot be determined from public signal alone. The distinction matters enormously for thesis fit. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI medical documentation product pricing"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.7092274680000001,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "Abridge AI clinical documentation ambient speech healthcare"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI ambient scribe replaces human scribe physician workflow Epic integration"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.6831133319999999,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "needs-more-info",
+        "rationale": "**Belief B (Vertical Depth) \u2014 Strong.** Abridge is unambiguously healthcare-only: ambient AI clinical documentation deeply embedded in Epic (first Epic \"Pal\" partner), deployed at Mayo Clinic, Johns Hopkins, Kaiser Permanente, and 250+ health systems. It has proprietary clinical-conversation data at massive scale, KLAS Market Leader recognition two consecutive years, and $800M raised. The vertical moat signal is among the strongest possible at Phase 1.\n\n**Belief A (Labor Replacement) \u2014 Ambiguous; flagged for review.** The product converts physician-patient conversations into draft clinical notes, which materially replaces the work of a human medical scribe (a role that hospitals pay ~$20\u201330/hr). That is a genuine labor-replacement wedge. However, the Johns Hopkins deployment description explicitly describes output as a \"draft clinical note for providers\" \u2014 implying the physician still reviews and signs off before the note is finalized in the EHR. This is the canonical augmentation pattern (human is still the agent of record). Whether the physician review is substantive editing (augmentation) or a rubber-stamp sign-off after the AI does all the real work (functional replacement of the scribe role) cannot be determined from public signal alone. The distinction matters enormously for thesis fit. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.5
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 7332,
+    "output_tokens": 697,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 7749
+  },
+  "cost_usd": 0.034776
+}

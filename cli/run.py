@@ -8,16 +8,7 @@ import config
 from orchestrator.agent import run_phase
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Run a deal-flow phase against a company.")
-    parser.add_argument("company", help="Company name to evaluate")
-    parser.add_argument("--phase", type=int, default=1, help="Phase number (default: 1)")
-    args = parser.parse_args()
-
-    print(f"\nModel: {config.MODEL}")
-    print(f"Running Phase {args.phase} on: {args.company}\n")
-    verdict = run_phase(args.phase, args.company)
-
+def print_verdict(verdict) -> None:
     u = verdict.usage
     input_cost = u["input_tokens"] * 3 / 1_000_000
     output_cost = u["output_tokens"] * 15 / 1_000_000
@@ -26,6 +17,7 @@ def main() -> None:
     total_cost = input_cost + output_cost + cache_write_cost + cache_read_cost
 
     print("=" * 60)
+    print(f"PHASE:      {verdict.phase}")
     print(f"VERDICT:    {verdict.verdict.upper()}")
     print(f"CONFIDENCE: {verdict.confidence:.2f}")
     print(f"RUN ID:     {verdict.run_id}")
@@ -52,6 +44,47 @@ def main() -> None:
     print(f"  cache read:   {u['cache_read_input_tokens']:,}")
     print(f"  est. cost:    ${total_cost:.4f}")
     print("=" * 60)
+
+
+def checkpoint(company: str, verdict) -> str:
+    """Human-in-the-loop gate. Returns 'advance', 'kill', or 'dig-deeper'."""
+    print(f"\nPhase {verdict.phase} complete for {company}: {verdict.verdict.upper()} "
+          f"(confidence {verdict.confidence:.2f})")
+    while True:
+        choice = input("Human decision — advance / kill / dig-deeper: ").strip().lower()
+        if choice in ("advance", "kill", "dig-deeper"):
+            return choice
+        print("Please type exactly one of: advance, kill, dig-deeper")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Run a deal-flow phase against a company.")
+    parser.add_argument("company", help="Company name to evaluate")
+    parser.add_argument(
+        "--phase", type=int, default=1,
+        help="Phase to start at (default: 1). Starting at 2 skips the Phase 1 checkpoint.",
+    )
+    args = parser.parse_args()
+
+    print(f"\nModel: {config.MODEL}")
+
+    if args.phase == 1:
+        print(f"Running Phase 1 on: {args.company}\n")
+        verdict = run_phase(1, args.company)
+        print_verdict(verdict)
+
+        decision = checkpoint(args.company, verdict)
+        if decision != "advance":
+            print(f"\nHuman decision: {decision}. Stopping before Phase 2.")
+            return
+
+        print(f"\nRunning Phase 2 on: {args.company}\n")
+        verdict = run_phase(2, args.company)
+        print_verdict(verdict)
+    else:
+        print(f"Running Phase {args.phase} on: {args.company}\n")
+        verdict = run_phase(args.phase, args.company)
+        print_verdict(verdict)
 
 
 if __name__ == "__main__":

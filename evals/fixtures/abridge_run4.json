@@ -1,0 +1,75 @@
+{
+  "run_id": "c7d21c5c",
+  "company": "Abridge",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:09:42.175529+00:00",
+  "expected_verdict": null,
+  "verdict": "kill",
+  "confidence": 0.72,
+  "rationale": "**Belief A (Labor Replacement): WEAK \u2014 augmentation, not replacement.** Abridge's core workflow is: ambient listening \u2192 AI-generated *draft* clinical note \u2192 clinician reviews, edits, and signs. Johns Hopkins' own documentation explicitly describes the output as a \"draft clinical note for providers.\" The physician remains the agent of record; the note cannot ship without clinician review and signature. This is the canonical augmentation pattern \u2014 the human still touches, reviews, and corrects before it ships. The product replaces the human scribe role partially, but the attending physician is still doing the job of reviewing/approving documentation. Abridge's own website language (\"draft documentation,\" \"free clinicians to focus more\") confirms the augmentation framing. **Belief B (Vertical Depth): STRONG.** Abridge is deeply embedded in healthcare \u2014 Epic's first AI partner (\"First PAL\"), deployed at Mayo Clinic, Duke, Johns Hopkins, Kaiser Permanente (250+ health systems), with proprietary clinical conversation data and tight EHR workflow integration. The vertical moat is real. However, under the thesis, Belief A failure is disqualifying: the company explicitly frames the AI as a copilot assisting the clinician, not replacing any labor end-to-end. The revenue cycle automation module (\"billable documentation, automated from the start\") is the closest signal to full replacement, but the dominant product is augmentation. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI medical documentation product pricing labor replacement"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.48230677,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "Abridge AI clinical documentation ambient scribe healthcare"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI \"ambient\" \"documentation\" \"physician\" \"no human in the loop\" OR \"replaces scribe\" OR \"automated\" site:abridge.com OR press release"
+      },
+      "result_summary": {
+        "item_count": 0,
+        "confidence": 0.0,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI workflow how it works physician EHR draft note review clinician"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.6452660399999999,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "kill",
+        "rationale": "**Belief A (Labor Replacement): WEAK \u2014 augmentation, not replacement.** Abridge's core workflow is: ambient listening \u2192 AI-generated *draft* clinical note \u2192 clinician reviews, edits, and signs. Johns Hopkins' own documentation explicitly describes the output as a \"draft clinical note for providers.\" The physician remains the agent of record; the note cannot ship without clinician review and signature. This is the canonical augmentation pattern \u2014 the human still touches, reviews, and corrects before it ships. The product replaces the human scribe role partially, but the attending physician is still doing the job of reviewing/approving documentation. Abridge's own website language (\"draft documentation,\" \"free clinicians to focus more\") confirms the augmentation framing. **Belief B (Vertical Depth): STRONG.** Abridge is deeply embedded in healthcare \u2014 Epic's first AI partner (\"First PAL\"), deployed at Mayo Clinic, Duke, Johns Hopkins, Kaiser Permanente (250+ health systems), with proprietary clinical conversation data and tight EHR workflow integration. The vertical moat is real. However, under the thesis, Belief A failure is disqualifying: the company explicitly frames the AI as a copilot assisting the clinician, not replacing any labor end-to-end. The revenue cycle automation module (\"billable documentation, automated from the start\") is the closest signal to full replacement, but the dominant product is augmentation. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.72
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 10449,
+    "output_tokens": 812,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10332
+  },
+  "cost_usd": 0.046627
+}

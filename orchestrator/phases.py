@@ -22,5 +22,14 @@ PHASE_DEFINITIONS: dict[int, PhaseDefinition] = {
         name="sourcing",
         connectors=[ArxivConnector(), TavilyConnector(), GitHubConnector()],
     ),
-    # Phases 2–4 added in Milestones 2–3.
+    2: PhaseDefinition(
+        number=2,
+        name="screening",
+        # Same connector set as Phase 1 — Phase 2 differs by REASONING (pricing-model
+        # classifier, fund-fit, hiring signal), not by data source. EDGAR is deferred:
+        # near-empty for private startups, and every Phase 2 test in docs/phase-tests.md
+        # runs off Tavily (pricing pages, careers pages, news).
+        connectors=[TavilyConnector(), ArxivConnector(), GitHubConnector()],
+    ),
+    # Phases 3-4 added later in Milestone 3.
 }

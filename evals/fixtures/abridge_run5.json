@@ -1,0 +1,64 @@
+{
+  "run_id": "c9af6144",
+  "company": "Abridge",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:10:16.148023+00:00",
+  "expected_verdict": null,
+  "verdict": "needs-more-info",
+  "confidence": 0.52,
+  "rationale": "Abridge scores very strongly on Belief B (vertical depth): it is deeply embedded in clinical documentation workflows inside Epic EHR at major health systems, sells at the enterprise health-system level, has accumulated proprietary clinical conversation data, and was named KLAS Market Leader in Ambient AI 2025. The moat \u2014 healthcare-specific data, Epic integration, hospital procurement lock-in \u2014 is precisely what the thesis seeks. However, Belief A (labor replacement) is ambiguous at Phase 1 signal depth: Abridge replaces human medical scribes (real labor displaced) but its own product pages and third-party reviews consistently describe output as \"draft clinical notes\" that clinicians review and sign off on before EHR entry. This puts it in the augmentation zone for physician workflow, even if it fully eliminates the scribe role. Whether the net framing is replacement (of scribes) or augmentation (of physicians) requires a closer look at customer contracts, workflow evidence, and how health systems actually deploy it \u2014 data not available publicly. A human reviewer should assess whether scribe-role elimination meets the replacement threshold even when physician sign-off remains.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI healthcare product pricing labor replacement"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.5038500100000001,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "Abridge AI clinical documentation medical conversation"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Abridge AI ambient documentation replaces medical scribes EHR workflow clinician"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.645374104,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "needs-more-info",
+        "rationale": "Abridge scores very strongly on Belief B (vertical depth): it is deeply embedded in clinical documentation workflows inside Epic EHR at major health systems, sells at the enterprise health-system level, has accumulated proprietary clinical conversation data, and was named KLAS Market Leader in Ambient AI 2025. The moat \u2014 healthcare-specific data, Epic integration, hospital procurement lock-in \u2014 is precisely what the thesis seeks. However, Belief A (labor replacement) is ambiguous at Phase 1 signal depth: Abridge replaces human medical scribes (real labor displaced) but its own product pages and third-party reviews consistently describe output as \"draft clinical notes\" that clinicians review and sign off on before EHR entry. This puts it in the augmentation zone for physician workflow, even if it fully eliminates the scribe role. Whether the net framing is replacement (of scribes) or augmentation (of physicians) requires a closer look at customer contracts, workflow evidence, and how health systems actually deploy it \u2014 data not available publicly. A human reviewer should assess whether scribe-role elimination meets the replacement threshold even when physician sign-off remains.",
+        "confidence": 0.52
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 6923,
+    "output_tokens": 1065,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 7749
+  },
+  "cost_usd": 0.039069
+}

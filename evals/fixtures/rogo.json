@@ -1,0 +1,64 @@
+{
+  "run_id": "3f83699f",
+  "company": "Rogo",
+  "phase": 1,
+  "timestamp": "2026-07-08T16:07:51.863288+00:00",
+  "expected_verdict": "advance",
+  "verdict": "advance",
+  "confidence": 0.78,
+  "rationale": "**Belief A (Labor Replacement) \u2014 Strong.** Rogo's core product, Felix, is explicitly positioned as a \"24/7 banker/advisor/investor\" that performs end-to-end financial workflows \u2014 producing finished decks, models, and memos autonomously \u2014 for investment banks and PE firms. The company was founded by former investment banking analysts explicitly to replace the heavy lifting of junior analyst roles. The Instagram/TAMradar coverage states flatly \"an AI agent that wants to replace junior bankers,\" and Felix handles \"long-running, complex workflows.\" This is genuine replacement framing, not copilot/augmentation framing. **Belief B (Vertical Depth) \u2014 Strong.** Rogo is tightly anchored in institutional finance (investment banking, private equity, asset managers). It integrates proprietary financial data from S&P Global, Crunchbase, and FactSet, producing \"institutional-grade Excel\" outputs. With 35K+ bankers at 250 firms and backing from J.P. Morgan, Thrive Capital, Tiger Global, and Kleiner Perkins ($160M Series D, $300M+ total), it has deep distribution lock-in within a single vertical. **Caveat:** The weaker dimension is the autonomy boundary \u2014 public sources note bankers \"interact with Felix as they would with a junior analyst, receiving finished decks,\" but it is unclear from Phase 1 data whether the output goes directly downstream with zero human review, or whether senior bankers still QA before delivery to clients. This needs verification in Phase 2. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+  "tool_calls": [
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Rogo AI financial analyst product pricing"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.55060915,
+        "error": null
+      }
+    },
+    {
+      "tool": "arxiv_search",
+      "input": {
+        "query": "Rogo AI finance language model financial analysis"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.9,
+        "error": null
+      }
+    },
+    {
+      "tool": "tavily_search",
+      "input": {
+        "query": "Rogo AI Felix autonomous agent replaces junior banker analyst workflow"
+      },
+      "result_summary": {
+        "item_count": 5,
+        "confidence": 0.7177624880000001,
+        "error": null
+      }
+    },
+    {
+      "tool": "submit_verdict",
+      "input": {
+        "verdict": "advance",
+        "rationale": "**Belief A (Labor Replacement) \u2014 Strong.** Rogo's core product, Felix, is explicitly positioned as a \"24/7 banker/advisor/investor\" that performs end-to-end financial workflows \u2014 producing finished decks, models, and memos autonomously \u2014 for investment banks and PE firms. The company was founded by former investment banking analysts explicitly to replace the heavy lifting of junior analyst roles. The Instagram/TAMradar coverage states flatly \"an AI agent that wants to replace junior bankers,\" and Felix handles \"long-running, complex workflows.\" This is genuine replacement framing, not copilot/augmentation framing. **Belief B (Vertical Depth) \u2014 Strong.** Rogo is tightly anchored in institutional finance (investment banking, private equity, asset managers). It integrates proprietary financial data from S&P Global, Crunchbase, and FactSet, producing \"institutional-grade Excel\" outputs. With 35K+ bankers at 250 firms and backing from J.P. Morgan, Thrive Capital, Tiger Global, and Kleiner Perkins ($160M Series D, $300M+ total), it has deep distribution lock-in within a single vertical. **Caveat:** The weaker dimension is the autonomy boundary \u2014 public sources note bankers \"interact with Felix as they would with a junior analyst, receiving finished decks,\" but it is unclear from Phase 1 data whether the output goes directly downstream with zero human review, or whether senior bankers still QA before delivery to clients. This needs verification in Phase 2. Thesis-fit is not the same as company quality. This thesis would systematically miss: (a) horizontal tools that win on ubiquity and ecosystem lock-in rather than vertical depth, and (b) augmentation plays that begin as copilots and later expand into full labor replacement as trust and data accumulate. This verdict reflects thesis alignment at Phase 1 signal depth only.",
+        "confidence": 0.78
+      }
+    }
+  ],
+  "tools_used": [
+    "arxiv_search",
+    "tavily_search"
+  ],
+  "usage": {
+    "input_tokens": 7056,
+    "output_tokens": 761,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 7749
+  },
+  "cost_usd": 0.034908
+}
