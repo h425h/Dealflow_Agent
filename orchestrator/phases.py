@@ -7,6 +7,7 @@ from connectors.base import Connector
 from connectors.arxiv_connector import ArxivConnector
 from connectors.github_connector import GitHubConnector
 from connectors.tavily_connector import TavilyConnector
+from connectors.uspto_connector import USPTOConnector
 
 
 @dataclass
@@ -40,5 +41,12 @@ PHASE_DEFINITIONS: dict[int, PhaseDefinition] = {
         # Phase 3 prompt); it is not a research phase.
         connectors=[TavilyConnector()],
     ),
-    # Phase 4 added later in Milestone 3.
+    4: PhaseDefinition(
+        number=4,
+        name="deep_diligence",
+        # Expensive, evidence-heavy phase — the only phase where USPTO is wired in
+        # (IP defensibility / Alice Sec. 101 risk). Tavily + arXiv return for
+        # AI-washing capability verification and scientific/technical moat checks.
+        connectors=[USPTOConnector(), ArxivConnector(), TavilyConnector()],
+    ),
 }

@@ -60,7 +60,7 @@ def checkpoint(company: str, verdict) -> str:
         print("Please type exactly one of: advance, kill, dig-deeper")
 
 
-LAST_PHASE = 3   # highest phase currently implemented
+LAST_PHASE = 4   # highest phase currently implemented
 
 
 def main() -> None:

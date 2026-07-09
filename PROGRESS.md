@@ -9,9 +9,9 @@ one. Keep entries short — this is a log, not documentation. Newest entry on to
 
 **Milestone 3: Phases 2–4 + evals + memo.** Eval harness (`evals/connector_evals.py`,
 `evals/phase_evals.py`) is now built and passing — see Eval fixtures and Known
-Limitations below. Phase 2 (screening), Phase 3a (structured reasoning rubric), and
-Phase 3b (bull/bear/synthesizer debate) are built. Remaining M3 work: Phase 4 (deep
-diligence), EDGAR/USPTO connectors, `memo/generator.py`.
+Limitations below. Phases 2, 3a, 3b, and 4 (deep diligence) are all built —
+the full four-phase funnel is now implemented end to end. Remaining M3 work:
+EDGAR connector, `memo/generator.py`.
 
 `docs/phase-tests.md` is now the authoritative per-phase diligence test spec.
 Read it alongside `docs/source-paper.md` before writing any phase logic or prompt.
@@ -29,7 +29,9 @@ Read it alongside `docs/source-paper.md` before writing any phase logic or promp
 
 **M3 — Phases 2–4 + evals + memo**
 - `connectors/edgar_connector.py` — SEC EDGAR (fund-fit / stage checks, public financials)
-- `connectors/uspto_connector.py` — USPTO PatentsView (IP defensibility for Phase 4)
+- `connectors/uspto_connector.py` (built) — targets the USPTO Open Data Portal
+  (api.uspto.gov), NOT the originally-scoped PatentsView API, which is retired —
+  see session log for the live-migration finding.
 - Phase 2 (screening): pricing-model classifier, fund-fit/stage check, hiring-signal read
 - Phase 3 (preliminary eval), split into two builds:
   - **3a (built)**: Six Pensées, Seven Deadly Questions, operationalized
@@ -41,8 +43,13 @@ Read it alongside `docs/source-paper.md` before writing any phase logic or promp
     Chatbase experiment and an honest report on whether it resolved the
     boundary-case instability it was predicted to fix — short answer: not the
     way predicted, see below.
-- Phase 4 (deep diligence): IP defensibility, scientific/technical moat, data-moat
-  scoring, unit economics (when financials supplied), regulatory barriers
+- **Phase 4 (built)** — deep diligence: AI-washing/capability-reality check
+  (centerpiece), IP ownership acid test, Alice §101 risk flag, data-moat
+  scoring (defensive vs. generative), unit economics (DATA-BLIND unless real
+  financials supplied), regulatory barriers, team-gap analysis. Connectors:
+  USPTO + arXiv + Tavily, capped at 5 searches. Final phase of the funnel —
+  the four-phase pipeline (sourcing → screening → preliminary eval →
+  deep diligence) is now complete end to end.
 - `evals/connector_evals.py`, `evals/phase_evals.py`
 - `memo/generator.py` — full IC-style memo with mandatory "cannot determine" section
 
@@ -189,13 +196,16 @@ checked items are actually done (not "mostly done").
 
 ### Milestone 3 — Phases 2–4 + evals
 - [ ] `connectors/edgar_connector.py`
-- [ ] `connectors/uspto_connector.py`
+- [x] `connectors/uspto_connector.py` (targets the live USPTO Open Data Portal,
+      not the retired PatentsView API it was originally scoped against; smoke-
+      tested for graceful no-key / invalid-key handling only — no ODP API key
+      available in this environment to test a live authenticated query)
 - [x] Phase 2 (screening) implemented
 - [x] Phase 3a (preliminary eval — structured reasoning rubric) implemented
 - [x] Phase 3b (bull/bear/synthesizer debate) implemented
-- [ ] Phase 4 (deep diligence) implemented
+- [x] Phase 4 (deep diligence) implemented
 - [x] Human-in-the-loop checkpoint between every phase in `cli/run.py` (Phase 1 →
-      2 → 3 gates built; will extend as Phase 4 lands)
+      2 → 3 → 4 gates built — full funnel now gated end to end)
 - [x] `evals/connector_evals.py` — at least one eval per connector
 - [x] `evals/phase_evals.py` — at least one eval per phase
 - [ ] `memo/generator.py` — full run → IC-style memo, including "cannot determine" section
@@ -220,6 +230,74 @@ Add a short entry each session. Format:
 - What broke / open questions
 - What's next
 ```
+
+### 2026-07-09 (session 8)
+- Built Phase 4 (deep diligence) — the final funnel phase. Full four-phase
+  pipeline (sourcing → screening → preliminary eval → deep diligence) is now
+  implemented end to end.
+- **API-migration finding, discovered before writing any connector code:** the
+  task scoped `connectors/uspto_connector.py` against USPTO's PatentsView API
+  at `search.patentsview.org`. That domain no longer resolves (confirmed via
+  Google's authoritative DNS: NXDOMAIN). Root cause: PatentsView migrated into
+  the USPTO Open Data Portal (ODP) on 2026-03-20. Verified the real, current
+  endpoint live: `POST https://api.uspto.gov/api/v1/patent/applications/search`
+  returns a clean `401 Unauthorized` (not a connection failure), confirming
+  host/path/method are correct; cross-referenced auth header (`X-API-Key`) and
+  response field names (`applicationMetaData`, `assigneeBag`, `inventorBag`,
+  `patentFileWrapperDataBag`) against USPTO ODP docs and a third-party client
+  library. Built the connector against the real, current API rather than the
+  stale one in the task description — flagging this because it's exactly the
+  kind of "world changed since training data" situation this project's
+  honesty-first design principle exists for.
+- `connectors/uspto_connector.py`: absence of patents (or absence of an API
+  key) is coded as neutral/DATA-BLIND (confidence 0.0, no error framing as a
+  negative signal) — same pattern as GitHub's absence handling in Phase 1,
+  per the task's explicit instruction that many strong AI companies
+  deliberately use trade secrets over patents. Smoke-tested both graceful
+  failure paths (no key → clear DATA-BLIND error; invalid key → clean 403,
+  no crash). **Not tested against a live authenticated query** — ODP API keys
+  require USPTO.gov + ID.me identity verification, which isn't obtainable in
+  this environment. This is an honest, open gap: the connector's happy path
+  (parsing real patent results) is unverified against live data, only
+  designed defensively (`.get()` with fallback keys) against the documented
+  schema.
+- `orchestrator/phases.py`: `PHASE_DEFINITIONS[4]`, connectors = [USPTO, arXiv,
+  Tavily], 5-search cap (highest of any phase, per the spec — Phase 4 is the
+  expensive evidence-heavy phase).
+- `orchestrator/prompts.py`: `PHASE_PROMPTS[4]` — 7-field rubric (AI-washing/
+  capability-reality check as centerpiece, IP ownership acid test, Alice §101
+  risk flag, data-moat scoring, unit economics, regulatory barriers, team-gap
+  analysis). AI-washing check explicitly requires distinguishing "verified via
+  independent/technical source" from "unverified, company-claimed only" — a
+  company's own marketing is explicitly ruled out as evidence of its own
+  capability. DATA-BLIND honesty rule restated with higher stakes language
+  (Phase 4 fabrications are more dangerous since this phase is supposed to be
+  the rigorous check). A failed AI-washing check is written to override
+  upstream signal from Phases 1-3, since it means the earlier phases' evidence
+  base itself may not be trustworthy (the Builder.ai failure mode).
+- `cli/run.py`: `LAST_PHASE = 4`; Phase 3 → 4 checkpoint falls out of the
+  existing generalized loop with no new code needed.
+- **Ran Slang.ai through Phase 4** using its existing Phase 1-3 saved runs
+  (`slang.ai_phase{1,2,3}_*.json` from session 6) as `prior_verdicts`, per the
+  budget-conscious instruction not to re-run earlier phases. Result: ADVANCE,
+  confidence 0.68. Used exactly 5 searches (1 uspto, 1 arxiv, 3 tavily) — at
+  the cap. USPTO search correctly returned a DATA-BLIND result (no key
+  configured) and the rubric correctly did NOT treat this as "no patents" —
+  it explicitly separated "IP ownership: DATA-BLIND (USPTO API not
+  configured)" from any capability judgment. The AI-washing check produced a
+  genuinely nuanced finding: "PARTIALLY VERIFIED" — third-party review sites
+  independently confirmed the product does what it claims (including a
+  specific critical detail, "does not take phone orders," that only comes
+  from actual use, not marketing) while explicitly flagging that underlying
+  model architecture and performance benchmarks remain unverified. Other
+  DATA-BLIND flags: Alice §101 (no patent claims to assess), unit economics
+  (no financials disclosed), and co-founder/CTO backgrounds beyond the CEO.
+  Verdict held the Series B stage-mismatch caveat carried forward from Phase
+  3. Cost: $0.1493. Full trace: `data/runs/slang.ai_phase4_0f094903.json`.
+- What's next: EDGAR connector and `memo/generator.py` are the two remaining
+  M3 items. Also worth flagging for a future session: getting a real USPTO
+  ODP API key (requires ID.me verification, a human/manual step) to validate
+  the connector's happy path against live patent data — currently unverified.
 
 ### 2026-07-09 (session 7)
 - Built Phase 3b: the bull/bear/synthesizer debate, designed against two named
