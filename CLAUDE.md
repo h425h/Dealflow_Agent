@@ -6,14 +6,17 @@ first, every session, before doing anything.
 
 ## Before you write any code, read these in order
 
-1. **`README.md`** — architecture, the four-phase funnel, the connector
-   interface, migration triggers, and the full "what NOT to do" list. The file
-   tree in README's Architecture section is authoritative: every file is tagged
-   with the milestone it belongs to.
-2. **`PROGRESS.md`** — the current active milestone and a per-file checklist.
+1. **`README.md`** — the project front door: what this is, the thesis it
+   encodes, and the findings from actually running it. Start here to understand
+   *why* this exists before touching *how* it's built.
+2. **`docs/BUILD_NOTES.md`** — the build operating contract: architecture, the
+   four-phase funnel, the connector interface, migration triggers, and the full
+   "what NOT to do" list. The file tree in its Architecture section is
+   authoritative: every file is tagged with the milestone it belongs to.
+3. **`PROGRESS.md`** — the current active milestone and a per-file checklist.
    This tells you exactly what to build *now* vs. later. Newest session log is
    at the top.
-3. **`docs/source-paper.md`** — the VC domain knowledge this whole system is
+4. **`docs/source-paper.md`** — the VC domain knowledge this whole system is
    built on (the four phases, Six Pensées, Seven Deadly Questions, the
    question-template library, the reliability/confidence framing). Read this
    before writing any phase logic, prompt, or anything involving investment

@@ -10,8 +10,10 @@ one. Keep entries short — this is a log, not documentation. Newest entry on to
 **Milestone 3: Phases 2–4 + evals + memo.** Eval harness (`evals/connector_evals.py`,
 `evals/phase_evals.py`) is now built and passing — see Eval fixtures and Known
 Limitations below. Phases 2, 3a, 3b, and 4 (deep diligence) are all built —
-the full four-phase funnel is now implemented end to end. Remaining M3 work:
-EDGAR connector, `memo/generator.py`.
+the full four-phase funnel is now implemented end to end. `memo/generator.py`
+(IC-style memo synthesizer) is now built and demonstrated on two contrasting
+full four-phase runs (Slang.ai advance, Chatbase kill). Remaining M3 work:
+EDGAR connector.
 
 `docs/phase-tests.md` is now the authoritative per-phase diligence test spec.
 Read it alongside `docs/source-paper.md` before writing any phase logic or prompt.
@@ -208,7 +210,7 @@ checked items are actually done (not "mostly done").
       2 → 3 → 4 gates built — full funnel now gated end to end)
 - [x] `evals/connector_evals.py` — at least one eval per connector
 - [x] `evals/phase_evals.py` — at least one eval per phase
-- [ ] `memo/generator.py` — full run → IC-style memo, including "cannot determine" section
+- [x] `memo/generator.py` — full run → IC-style memo, including "cannot determine" section
 
 ### Milestone 4 — LangGraph port (only if triggers in README are met)
 - [ ] Trigger met: ____________________ (write which one, and why)
@@ -230,6 +232,63 @@ Add a short entry each session. Format:
 - What broke / open questions
 - What's next
 ```
+
+### 2026-07-10 (session 9)
+- Built `memo/generator.py` — the final M3 piece. Single Claude call (no tools,
+  no new searches) over a company's accumulated Phase 1-4 JSON records loaded
+  from `data/runs/`, with the system prompt on `cache_control: ephemeral`
+  (`orchestrator/prompts.py` `MEMO_SYSTEM_PROMPT`). Loader
+  (`_load_phase_records`) globs `data/runs/{slug}_phase{n}_*.json` per phase
+  and picks the latest by timestamp; Phase 3 specifically prefers the file
+  with a non-null `debate` field, since `run_phase(3, ...)` saves twice (a
+  rubric-only pass, then the final rubric+debate combined verdict) and only
+  the combined one is the phase's real final verdict. Output is 8 mandatory
+  sections in a fixed order (headline verdict, thesis fit scored on Belief
+  A/B, evidence cited to phase, bull/bear from the Phase 3 debate, risks
+  including the AI-washing verdict and IP picture, value creation plan split
+  controllable/uncontrollable, "does the price reflect the risk," and the
+  mandatory "what this system cannot determine" split into DATA-ACCESS LIMITS
+  vs. STRUCTURAL LIMITS) — written to `data/memos/{company}_memo.md`.
+- **Ran Chatbase through Phase 4** first, reusing its existing Phase 1-3
+  fixtures (`chatbase_phase1_9b140658`, `chatbase_phase2_43b36cb3`,
+  `chatbase_phase3_514c96fa` — the last already contains a full bull/bear
+  debate from session 7) as `prior_verdicts`, per the same budget-conscious
+  pattern as Slang.ai's Phase 4 in session 8. Result: KILL, confidence 0.82,
+  consistent with Phases 1-3 (0.82 → 0.82 → 0.88). Phase 4 added real
+  technical substance rather than just re-confirming: architecture is
+  standard RAG over commodity LLMs (zero arXiv publications, zero novel
+  claims), Zero Data Retention is enforced by policy — which structurally
+  forecloses any generative data moat, not just leaves it unevidenced — and
+  the solo-founder/no-enterprise-sales-leadership gap was named as a
+  specific, dangerous configuration given the company's active PLG-to-
+  enterprise transition. Cost: $0.1819. Saved as
+  `data/runs/chatbase_phase4_b6776120.json`. **Honesty note:** the task
+  brief said Chatbase had "Phase 1/2 fixtures already" and only needed Phase
+  3+4 run — Phase 3 (rubric + debate) had in fact already been completed in
+  session 7. Did not re-run it (would have just re-spent money re-confirming
+  an existing KILL/0.88), reused the existing fixture, and am flagging the
+  discrepancy here rather than silently treating the task brief as correct.
+- **Generated both memos** — the contrast is the point of this session's demo.
+  Slang.ai: ADVANCE/0.70, explicit split verdict (Belief A strong, Belief B
+  credible-but-fragile), explicitly named the Series B stage mismatch as a
+  fund-mandate question that overrides thesis fit for an early-stage
+  mandate, proposed deal structure (milestone tranche, valuation cap,
+  pro-rata) in lieu of a fabricated price since valuation was never
+  disclosed. Chatbase: KILL/0.88, both beliefs failed independently (not
+  just on balance), correctly pulled the actual Phase 3 debate transcript
+  (bull explicitly conceded the venture-return argument mid-debate) rather
+  than inventing a generic bull/bear split, and correctly reported that
+  there is no priceable deal at all (bootstrapped, not raising) rather than
+  forcing a valuation answer. Both memos included the mandatory two-part
+  "cannot determine" section (data-access vs. structural limits) and the
+  thesis-blind-spot note. Cost: Slang.ai $0.1011, Chatbase $0.0958. Session
+  total: $0.3788. Full memos: `data/memos/slang.ai_memo.md`,
+  `data/memos/chatbase_memo.md`.
+- What's next: EDGAR connector is the one remaining M3 checklist item (Phase
+  2's fund-fit/stage tests currently run entirely off Tavily; EDGAR would
+  add real filing data for any company that has one). After that, M3 is
+  fully complete and M4 (LangGraph port) only begins if a migration trigger
+  in README is actually felt, per the project's stated anti-preemption rule.
 
 ### 2026-07-09 (session 8)
 - Built Phase 4 (deep diligence) — the final funnel phase. Full four-phase

@@ -9,6 +9,7 @@ MODEL = "claude-sonnet-4-6"
 MAX_RESULTS_PER_CONNECTOR = 5
 
 DATA_DIR = Path(__file__).parent / "data" / "runs"
+MEMO_DIR = Path(__file__).parent / "data" / "memos"
 
 # Per-million-token pricing for MODEL (claude-sonnet-4-6), used to estimate run cost.
 _PRICE_PER_MILLION = {

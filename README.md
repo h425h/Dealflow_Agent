@@ -1,149 +1,172 @@
 # Deal Flow Agent
 
-An agentic system that augments the venture capital deal flow process — sourcing,
-screening, preliminary evaluation, and deep diligence — built around the four-phase
-funnel framework from MGMT 2640 (Wharton, Venture Capital and Entrepreneurial
-Management).
+An agentic VC deal-flow system that runs a company through a four-phase diligence
+funnel — sourcing, screening, preliminary evaluation, and deep diligence — the
+way a real investment committee process is structured (mapped from MGMT 2640,
+Wharton's Venture Capital and Entrepreneurial Management course). Each phase is
+a Claude agent with tool-use access to a scoped set of connectors (arXiv,
+Tavily web search, GitHub, USPTO); it decides what to search, synthesizes what
+it finds, and returns a verdict with a confidence score and explicit rationale.
+Between every phase, a human decides whether to advance, kill, or dig deeper —
+the system never autonomously kills a deal. State from every run is saved as
+JSON, so any verdict is fully auditable back to the searches that produced it.
 
-This is a personal project, not a course submission. Goals, in order:
-1. Genuinely understand agentic AI system design by building one for real.
-2. Have a working, demoable artifact for VC internship conversations.
-3. Build something architected well enough to plausibly extend into a real tool.
-
-**Read this file at the start of every session.** Then read `PROGRESS.md` for current
-state. Do not start building before reading both.
+This is a personal project built to learn agentic system design for real and
+to have a working artifact for VC internship conversations — not a course
+submission, and not a production tool.
 
 ---
 
-## Core design philosophy
+## The thesis it encodes
 
-- **Human-in-the-loop, always.** The agent never autonomously kills a deal. It runs
-  a phase, presents findings + a recommendation, and a human decides whether to
-  advance, kill, or dig deeper. This is a deliberate position, not a missing feature —
-  see "Why human-in-the-loop" below.
-- **Connectors are dumb and swappable.** Every data source (arXiv, USPTO, EDGAR,
-  GitHub, Tavily, future paid APIs like Harmonic/PitchBook) implements the same
-  interface. The orchestrator does not know or care which connector it's calling.
-- **Build from scratch before reaching for a framework.** We are deliberately
-  building the orchestrator as plain Python first, and porting to LangGraph later —
-  see "Migration triggers" below. Do not install or use LangGraph until those
-  triggers are met. This is intentional, not a TODO.
-- **No phase should silently fail.** Every connector result includes a confidence
-  rating. Every phase verdict includes explicit rationale. The memo's final section
-  must always state what the system could *not* determine (founder character, team
-  chemistry, execution grit) — this is a required output, not optional polish.
+The system screens against one specific, falsifiable investment thesis — not a
+generic "is this a good company" rubric. Two beliefs, weighted, not strict:
 
-## Why human-in-the-loop
+- **Belief A — Labor replacement, not augmentation.** Durable AI value comes
+  from replacing an end-to-end job a human was paid to do, not from making a
+  human faster. The test: could you remove the human from this role entirely
+  and route the output straight to the next step? If a human still reviews,
+  approves, or corrects it before it ships, that's augmentation — and this
+  thesis passes on augmentation, however well-executed.
+- **Belief B — Vertical depth, not horizontal breadth.** The moat is not model
+  quality — it's proprietary data and distribution locked inside one
+  industry's workflow. A horizontal tool has to win on model quality, a race
+  it will lose to frontier labs.
 
-Full reasoning is in `docs/source-paper.md` — **read this before writing any
-phase logic, prompts, or connector code.** It is the actual design basis for
-the four phases, the decision points within each, the specific question
-templates, and the reliability/confidence framing for connector results. The
-short version: AI can compress the mechanical/factual parts of diligence —
-market sizing, patent landscape, competitive mapping, financial sensitivity —
-but cannot assess founder trustworthiness, team chemistry, or conviction.
-Those require judgment. A system that pretends otherwise is dishonest about
-what it's doing. Every phase checkpoint exists to keep a human making the
-calls AI can't make.
+**Weighted, not strict:** a company exceptional on one belief and credible on
+the other can still advance, with the weaker dimension carried forward as an
+explicit caveat — not papered over, not silently dropped. A company weak on
+both is a clean kill.
+
+The system is also explicit about what this thesis is *not* built to catch —
+see Findings, below.
 
 ## Architecture
 
 ```
-dealflow-agent/
-├── requirements.txt      # MILESTONE 1: anthropic, arxiv, requests, python-dotenv only
-├── config.py             # MILESTONE 1: model name + shared constants
-├── connectors/
-│   ├── __init__.py
-│   ├── base.py                  # MILESTONE 1 — build fully
-│   ├── arxiv_connector.py       # MILESTONE 1 — build fully
-│   ├── tavily_connector.py      # MILESTONE 2 — stub only (docstring + pass)
-│   ├── uspto_connector.py       # MILESTONE 3 — stub only
-│   ├── edgar_connector.py       # MILESTONE 3 — stub only
-│   └── github_connector.py      # MILESTONE 2 — stub only
-├── orchestrator/
-│   ├── __init__.py
-│   ├── agent.py           # MILESTONE 1 — build fully (from-scratch agentic loop)
-│   ├── graph.py            # MILESTONE 4+ — stub only, do not build until migration triggers are met
-│   ├── phases.py           # MILESTONE 1 — build fully, but only define Phase 1 for now
-│   └── prompts.py          # MILESTONE 1 — build fully, but only Phase 1's prompt
-├── evals/
-│   ├── __init__.py
-│   ├── connector_evals.py    # MILESTONE 3 — stub only
-│   └── phase_evals.py         # MILESTONE 3 — stub only
-├── memo/
-│   ├── __init__.py
-│   └── generator.py        # MILESTONE 3 — stub only
-├── cli/
-│   └── run.py               # MILESTONE 1 — build fully (argparse, takes a company name, runs Phase 1, prints verdict)
-├── data/runs/              # saved JSON per company run — audit trail + eval fixtures
-└── tests/
-    └── test_connectors.py   # MILESTONE 1 — build fully (real smoke test against arXiv API)
+company name
+     │
+     ▼
+Phase 1 — Sourcing        (arXiv, Tavily, GitHub)     → advance / kill / needs-more-info
+     │  human checkpoint
+     ▼
+Phase 2 — Screening       (Tavily, arXiv, GitHub)      → pricing model, fund-fit, hiring signal
+     │  human checkpoint
+     ▼
+Phase 3 — Preliminary eval (pure reasoning + 1 search) → Six Pensées, Seven Deadly Questions,
+     │  human checkpoint                                  Clone Test, then a bull/bear/synthesizer debate
+     ▼
+Phase 4 — Deep diligence  (USPTO, arXiv, Tavily)       → AI-washing check, IP acid test, data-moat score
+     │  human checkpoint
+     ▼
+memo/generator.py  →  IC-style memo, mandatory "what this system cannot determine" section
 ```
 
-**Rule for any session:** only build fully what's tagged with the current
-milestone (see `PROGRESS.md` for which milestone is active). Everything tagged
-with a later milestone gets a stub file only — a docstring naming the
-milestone it belongs to, and `pass`. Do not implement ahead of the current
-milestone even if it seems quick.
+Five connectors (arXiv, Tavily, GitHub, USPTO, and a stubbed EDGAR), one
+hand-rolled agentic loop (no LangGraph — see below), one memo synthesizer.
 
-**The four phases** (mapped from the course funnel):
+## Findings
 
-| Phase | Maps to | Connectors used | Output |
-|---|---|---|---|
-| 1. Sourcing | One-minute test, exogenous pre-qualifiers | arXiv, Tavily, GitHub | advance/kill + rationale |
-| 2. Screening | Ten-minute test, fund fit | EDGAR, Tavily | advance/kill + rationale |
-| 3. Preliminary evaluation | Six Pensées, Seven Deadly Questions, bull/bear case | none — pure reasoning | advance/kill + rationale |
-| 4. Deep diligence | IP validity, unit economics, regulatory | USPTO, arXiv, EDGAR | advance/kill + rationale |
+This is the part that matters — what happened when the thesis met real
+companies, reported honestly, including where a pre-registered prediction
+turned out to be wrong.
 
-After any phase, output feeds `memo/generator.py` if the human stops here and wants
-a summary memo of findings so far.
+**The thesis discriminates.** Run against contrasting real companies, the
+funnel produced different verdicts for traceable, specific reasons — not vibes.
+[Slang.ai](data/memos/slang.ai_memo.md) (restaurant phone-answering AI, no
+human review before a reservation ships) landed **ADVANCE, with an explicit
+stage-fit caveat** — full four-phase pass on both beliefs, undercut only by a
+Series B entry price that may not fit an early-stage mandate.
+[Chatbase](data/memos/chatbase_memo.md) (GPT-wrapper chatbot builder) landed
+**KILL** — both beliefs failed independently: per-seat pricing and a ~20%
+human-escalation rate are augmentation, not replacement, and a policy of Zero
+Data Retention structurally forecloses any vertical data moat. Same funnel, same
+rubric, opposite verdicts, each one traceable to a specific test (pricing-model
+classifier, vertical-wedge check, data-moat score).
 
-## Migration triggers — when to introduce LangGraph
+**A falsified prediction, reported honestly.** I pre-registered that the Phase
+3 bull/bear debate would resolve a verdict-instability problem discovered on
+Abridge (Phase 1 flipped between KILL and NEEDS-MORE-INFO across identical
+runs) by structurally failing to converge — bull and bear would genuinely
+disagree, and the system would land on NEEDS-MORE-INFO for real reasons. It
+didn't happen that way. All 3 independent debate runs on Abridge converged on
+KILL (confidence 0.92 / 0.85 / 0.82), and the control company (Chatbase) also
+converged — confirming the debate mechanism isn't just hedging by default; it
+converges when the evidence warrants it. **Diagnosis:** Phase 3's structured
+rubric, by forcing the operationalized labor-replacement test to reason
+explicitly through the workflow step by step, resolved Abridge's core ambiguity
+(the physician's sign-off is legally *required*, not a product choice Abridge
+could remove) *before* the debate ever started. There was nothing substantive
+left for bull and bear to disagree about. The Phase 1 instability turned out to
+be a symptom of thin, unsynthesized search results forcing a snap judgment —
+not a genuinely irreducible thesis tension. The fix landed one phase earlier
+than predicted, and the mechanism was shown to converge for the right reason
+(the Chatbase control also converged, decisively, ruling out "hedges by
+default" as the explanation) — but as of the most recent session, no run
+against any company has yet produced a genuine `converged=false` with a named
+resolving question. That true-positive test remains open, not solved: finding
+a company whose Phase 3a rubric holds real residual tension is still on the
+list.
 
-Do **not** install LangGraph preemptively. Port `orchestrator/agent.py` to
-`orchestrator/graph.py` only when at least two of these are actually being felt
-during development (not anticipated — felt):
+**Confidence didn't climb with more evidence — it round-tripped.** Slang.ai's
+confidence moved 0.68 (Phase 1) → 0.75 (Phase 2) → 0.72 (Phase 3) → 0.68
+(Phase 4) → 0.70 (final memo). It peaked early and gave back most of that gain
+as deeper diligence added qualifications: Phase 3's Clone Test flagged the
+data moat behind the company's strongest bull argument as never publicly
+substantiated, and Phase 4 added a co-founder identity gap and escalating
+regulatory exposure on top. Four phases of diligence on the one company that
+passed every phase ended almost exactly where it started, not higher — more
+scrutiny bought more named caveats, not more conviction.
 
-1. **Persistence pain** — losing progress because a run was interrupted and the
-   JSON-per-phase save isn't enough to cleanly resume.
-2. **Branching pain** — a phase needs to conditionally loop back (e.g. Phase 2
-   says "not enough info, broaden Phase 1 search") and the `if/elif` control flow
-   in `cli/run.py` is getting tangled.
-3. **Interrupt pain** — wanting to pause mid-phase (not just between phases) for
-   human input, and the hand-rolled `input()` checkpoint is too blunt for that.
+**Where public-data AI stops working.** DATA-BLIND flags cluster
+predictably on valuation, capital needs, unit economics, cap table, and
+advisor relationships — real gaps, but ones a data room closes. A second
+category doesn't close with more data at all: founder trustworthiness,
+co-founder chemistry, and execution grit under pressure. Every memo this
+system produces ends with a two-part "what this system cannot determine"
+section for exactly this reason — DATA-ACCESS LIMITS (resolvable with a data
+room) versus STRUCTURAL LIMITS (resolvable only by a human in the room). This
+split is why the human-in-the-loop checkpoints exist between every phase, not
+a UX nicety layered on top.
 
-When triggered: connectors do not change. Only the orchestration layer is rebuilt
-as a `StateGraph`, phases become nodes, the JSON state dict becomes a typed graph
-state, and `input()` becomes `interrupt()`.
+## Cost
 
-## Stack
+Individual phases run $0.03–$0.19 depending on phase and whether Phase 3's
+bull/bear debate fires; Phase 4 (the evidence-heavy deep-diligence phase) and
+Phase 3-with-debate are the most expensive. A full four-phase run plus memo
+lands around **$0.40–$0.55 end to end** (Slang.ai: $0.0428 + $0.0393 + $0.0752
++ $0.1493 + $0.1011 = $0.4077; Chatbase: $0.0337 + $0.0297 + $0.1914 + $0.1819
++ $0.0958 = $0.5325 — Chatbase's Phase 3 included a full 3-round bull/bear
+debate, Slang.ai's did not). Kept this low by prompt caching on every system
+prompt and a hard per-phase search cap (4 searches for Phases 1–2, 1 for Phase
+3, 5 for Phase 4).
 
-**In use now:**
-- `anthropic` SDK (Claude, with tool use)
-- `arxiv` (free API, no key)
-- `requests` (USPTO PatentsView, SEC EDGAR full-text search — both free/keyless)
-- `python-dotenv`
+## What's deliberately not built, and why
 
-**Added later, on trigger — do not install early:**
-- `tavily-python` — milestone 2 (agentic web search connector)
-- `langgraph`, `langsmith` — milestone 4 (see migration triggers above)
-- `chromadb` — only once a memo-archive RAG feature is actually being built
+- **No LangGraph.** The orchestrator is hand-rolled Python with the Anthropic
+  SDK's native tool use. Three migration triggers were named in advance
+  (persistence pain, branching pain, interrupt pain) and none has fired across
+  four phases and 9 build sessions — hand-rolled state passing has been enough.
+  See `docs/BUILD_NOTES.md` for the full trigger list.
+- **No paid data connectors.** Harmonic, PitchBook, and similar sit behind the
+  same `Connector` interface every free connector implements, so swapping one
+  in is additive, not a rewrite — but the free-data version is what actually
+  proves the orchestration layer works, so that's what got built first.
+- **No RAG meta-memory.** A memo-archive retrieval layer (ChromaDB) needs an
+  archive of memos to retrieve over, and this system has produced exactly two.
+  Building retrieval before there's anything to retrieve would be building
+  ahead of the evidence.
 
-## What NOT to do
+## Read more
 
-- Don't build all five connectors before Phase 1 logic works end-to-end on one.
-- Don't add LangGraph, multi-agent patterns, or a web UI before the core
-  single-agent-per-phase loop is proven with real data.
-- Don't let connectors contain any VC reasoning/judgment — that belongs in
-  `orchestrator/prompts.py` only. Connectors fetch and structure data, nothing more.
-- Don't skip the "what this system cannot determine" section in memo output.
-
-## Session workflow
-
-1. Read this file.
-2. Read `docs/source-paper.md` if working on phase logic, prompts, or anything
-   involving VC reasoning/judgment (not needed for pure infra work like
-   connector boilerplate).
-3. Read `PROGRESS.md` for current milestone and last session's stopping point.
-4. Work on the **next unchecked item only** — don't jump ahead.
-5. Before ending a session, update `PROGRESS.md` (see that file for the format).
+- Full memos: [`data/memos/slang.ai_memo.md`](data/memos/slang.ai_memo.md)
+  (advance) · [`data/memos/chatbase_memo.md`](data/memos/chatbase_memo.md)
+  (kill) — or the rendered HTML versions in the same folder.
+- [`docs/BUILD_NOTES.md`](docs/BUILD_NOTES.md) — architecture, connector
+  interface, migration triggers, session workflow, the full "what NOT to do"
+  list.
+- [`docs/source-paper.md`](docs/source-paper.md) — the VC domain knowledge
+  (Six Pensées, Seven Deadly Questions, the phase framework) this whole system
+  is built on.
+- [`PROGRESS.md`](PROGRESS.md) — the session-by-session build log, including
+  every dead end and honestly-reported result.
