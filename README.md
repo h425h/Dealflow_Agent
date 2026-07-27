@@ -5,7 +5,7 @@ funnel — sourcing, screening, preliminary evaluation, and deep diligence — t
 way a real investment committee process is structured (mapped from MGMT 2640,
 Wharton's Venture Capital and Entrepreneurial Management course). Each phase is
 a Claude agent with tool-use access to a scoped set of connectors (arXiv,
-Tavily web search, GitHub, USPTO); it decides what to search, synthesizes what
+Tavily web search, GitHub); it decides what to search, synthesizes what
 it finds, and returns a verdict with a confidence score and explicit rationale.
 Between every phase, a human decides whether to advance, kill, or dig deeper —
 the system never autonomously kills a deal. State from every run is saved as
@@ -56,14 +56,22 @@ Phase 2 — Screening       (Tavily, arXiv, GitHub)      → pricing model, fund
 Phase 3 — Preliminary eval (pure reasoning + 1 search) → Six Pensées, Seven Deadly Questions,
      │  human checkpoint                                  Clone Test, then a bull/bear/synthesizer debate
      ▼
-Phase 4 — Deep diligence  (USPTO, arXiv, Tavily)       → AI-washing check, IP acid test, data-moat score
+Phase 4 — Deep diligence  (arXiv, Tavily)              → AI-washing check, IP acid test, data-moat score
      │  human checkpoint
      ▼
 memo/generator.py  →  IC-style memo, mandatory "what this system cannot determine" section
 ```
 
-Four connectors (arXiv, Tavily, GitHub, USPTO), one hand-rolled agentic loop
+Three connectors (arXiv, Tavily, GitHub), one hand-rolled agentic loop
 (no LangGraph — see below), one memo synthesizer.
+
+Phase 4's IP analysis runs on arXiv + Tavily reasoning only — there is no
+patent-database connector. A USPTO connector existed but its live-data path
+was never verified against a real authenticated query (a key requires
+personal ID.me identity verification), so it was removed rather than left in
+as unverified machinery. The IP-ownership and Alice §101 rubric fields
+therefore come back DATA-BLIND far more often than not; that is the honest,
+structurally correct answer, not a gap to paper over.
 
 ## Findings
 

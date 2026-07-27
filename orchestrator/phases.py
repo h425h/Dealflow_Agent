@@ -7,7 +7,6 @@ from connectors.base import Connector
 from connectors.arxiv_connector import ArxivConnector
 from connectors.github_connector import GitHubConnector
 from connectors.tavily_connector import TavilyConnector
-from connectors.uspto_connector import USPTOConnector
 
 
 @dataclass
@@ -45,9 +44,13 @@ PHASE_DEFINITIONS: dict[int, PhaseDefinition] = {
     4: PhaseDefinition(
         number=4,
         name="deep_diligence",
-        # Expensive, evidence-heavy phase — the only phase where USPTO is wired in
-        # (IP defensibility / Alice Sec. 101 risk). Tavily + arXiv return for
-        # AI-washing capability verification and scientific/technical moat checks.
-        connectors=[USPTOConnector(), ArxivConnector(), TavilyConnector()],
+        # Expensive, evidence-heavy phase. USPTO was removed entirely: its
+        # live-data path was never verified against a real authenticated query
+        # (a key requires personal ID.me identity verification, never pursued),
+        # so IP defensibility / Alice Sec. 101 risk now run on arXiv + Tavily
+        # reasoning only, with DATA-BLIND expected on patent-specific fields
+        # far more often than not. Tavily + arXiv also cover AI-washing
+        # capability verification and scientific/technical moat checks.
+        connectors=[ArxivConnector(), TavilyConnector()],
     ),
 }

@@ -444,18 +444,7 @@ directly mislead an investment committee. If in doubt, mark it DATA-BLIND.
 HOW TO RUN THIS PHASE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-You have three search tools:
-
-  uspto_search — search USPTO patent applications/grants by company name (and,
-  if useful, by a named founder/inventor). Returns title, filing/grant dates,
-  assignees, inventors, and granted-vs-pending status per result. CRITICAL:
-  absence of patents is AMBIGUOUS, not negative — many strong AI companies
-  deliberately rely on trade secrets instead of patents, since patenting
-  requires public disclosure of the method. Do not treat "no patents found"
-  as a red flag by itself; treat it as one data point that narrows (but does
-  not by itself fail) the IP defensibility test. If uspto_search returns an
-  error (e.g. no API key configured in this environment), that is a
-  DATA-BLIND condition for the IP tests below, not evidence of anything.
+You have two search tools:
 
   arxiv_search — technical/scientific moat verification: does the company (or
   its founders) have published technical work substantiating the claimed AI
@@ -464,15 +453,27 @@ You have three search tools:
 
   tavily_search — capability evidence (product demos, technical blog posts,
   customer case studies, third-party reviews/benchmarks), regulatory context,
-  and any team/hiring gaps not already covered by Phases 1-3.
+  any team/hiring gaps not already covered by Phases 1-3, AND the only
+  available path to any public patent/IP signal (a funding announcement or
+  press piece that explicitly mentions a patent grant, assignment, or
+  license) — see the note on IP-analysis scope below.
 
-1. Run at most 5 searches total across all three tools, then call
-   submit_verdict. This is the highest search budget of any phase because it
-   is the most evidence-heavy — but still finite. Prioritize: 1 uspto_search
-   (company name), 1 arxiv_search (technical substantiation), and up to 3
-   tavily_search calls split across the AI-washing check, regulatory/team gap
-   checks, and any specific unresolved question flagged in the Phase 1-3
-   record. Do not run more than 5 searches under any circumstances.
+  NOTE ON IP-ANALYSIS SCOPE (read before the IP OWNERSHIP ACID TEST and
+  ALICE §101 RISK fields below): there is no patent-database connector. IP
+  analysis runs on arxiv_search + tavily_search reasoning only. Expect the
+  two patent-specific rubric fields to come back DATA-BLIND far more often
+  than not, since neither tool can query patent filings, claims, or assignee
+  records directly. DATA-BLIND here is the honest, structurally correct
+  answer, not a sign the search was insufficient — do not invent patent
+  facts to fill the gap.
+
+1. Run at most 5 searches total across both tools, then call submit_verdict.
+   This is the highest search budget of any phase because it is the most
+   evidence-heavy — but still finite. Prioritize: 1 arxiv_search (technical
+   substantiation) and up to 4 tavily_search calls split across the
+   AI-washing check, any publicly reported patent/IP information, regulatory/
+   team gap checks, and any specific unresolved question flagged in the
+   Phase 1-3 record. Do not run more than 5 searches under any circumstances.
 
 2. Fill the rubric below as a STRUCTURED response, each field under its own
    heading, in order — same pattern as Phase 3. This is the deliverable passed
@@ -507,35 +508,42 @@ THE RUBRIC — fill every field, in this order
    IP rights are EXCLUSIONARY, not affirmative — owning a patent is the right
    to exclude others from using an invention, NOT freedom to operate one's own
    product (a company can hold a valid patent and still infringe someone
-   else's). Answer three questions from evidence, or mark DATA-BLIND:
-   (a) Who really owns the core technology — is it ASSIGNED to the company
-       (recorded assignment, visible in uspto_search results as an assignee)
-       or merely LICENSED, and on what terms (field of use, termination,
-       change-of-control)? Founders routinely "have" technology that is
-       actually owned by a former employer or university — public patent
-       assignee records are the check for this, not the founders' own claims.
+   else's). There is no patent-database connector (see the note on IP-analysis
+   scope above), so answer the three questions below ONLY from whatever
+   arxiv_search/tavily_search evidence actually surfaces — e.g. a funding
+   announcement or press piece that explicitly states a patent grant,
+   assignment, or license — and mark DATA-BLIND, honestly, whenever nothing
+   public does, which will be the common case rather than the exception:
+   (a) Who really owns the core technology — is it ASSIGNED to the company or
+       merely LICENSED, and on what terms (field of use, termination,
+       change-of-control)? Founders routinely "have" technology actually owned
+       by a former employer or university. Without a patent-registry lookup
+       this is answerable only if a public source states it directly —
+       otherwise DATA-BLIND.
    (b) Integrity of patents in hand/pending — what do the claims ACTUALLY
-       cover, based on uspto_search results (titles, abstracts, status)? Claim
-       scope is often far narrower than founders publicly imply. If no patent
-       details are available, mark this DATA-BLIND rather than guessing claim
-       breadth.
+       cover? Without patent-database access this is DATA-BLIND unless a public
+       source quotes or describes actual claim language, which is rare — do not
+       guess claim breadth from the company's own marketing.
    (c) Freedom to operate — is there any public evidence of a blocking
-       third-party patent in the same space? This is very hard to determine
-       from a handful of searches; DATA-BLIND is the expected, correct answer
-       here far more often than not — do not overclaim freedom-to-operate
-       clearance from a thin search.
+       third-party patent in the same space? DATA-BLIND is the expected,
+       correct answer here far more often than not even with a patent
+       connector; without one, treat it as DATA-BLIND unless press coverage of
+       an active dispute exists — do not overclaim freedom-to-operate clearance
+       from a thin search.
 
 3. ALICE §101 RISK (for algorithmic AI specifically)
    Assess — as a risk flag, not a legal opinion — whether the company's core
-   technical claims (if any patents were found) look like they'd survive an
+   technical claims (if any patent claims are actually known from a public
+   source — see the IP OWNERSHIP ACID TEST above) look like they'd survive an
    Alice Corp. v. CLS Bank Section 101 challenge (the U.S. abstract-idea
    patentability test). Algorithms implemented on generic computing
    infrastructure with no claimed technical improvement to the computer
-   itself are the classic Alice-vulnerable pattern. If no patent claims are
-   available to assess (common — see DATA-BLIND note above), say so plainly:
-   this risk cannot be assessed without patent claim language, which you do
-   not have. Do not render a confident legal conclusion; this is a flag for
-   human patent counsel, not a determination.
+   itself are the classic Alice-vulnerable pattern. Because there is no
+   patent-database connector, patent claim language will be unavailable in the
+   overwhelming majority of runs — say so plainly: this risk cannot be assessed
+   without patent claim language, which you do not have. Do not render a
+   confident legal conclusion; this is a flag for human patent counsel, not a
+   determination.
 
 4. DATA-MOAT SCORING
    Score both dimensions explicitly, using evidence from all four phases:

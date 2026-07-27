@@ -36,7 +36,6 @@ def _connector_tools(phase_number: int) -> list:
         "arxiv": "Search arXiv for academic papers, technical methods, and founder publications about a company or domain.",
         "tavily": "Search the web for business-model signal: company website, pricing page, press coverage, job postings.",
         "github": "Search GitHub for public repos, contributor counts, and commit activity. Absence of results is neutral, not negative.",
-        "uspto": "Search USPTO patent applications/grants by company or inventor name. Absence of patents is ambiguous, not negative — many AI companies use trade secrets instead.",
     }
     for c in phase.connectors:
         tools.append({
