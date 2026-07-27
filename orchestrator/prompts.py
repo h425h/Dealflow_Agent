@@ -72,7 +72,18 @@ You have three search tools with distinct purposes:
 
   arxiv_search — research and technical signal: academic papers, technical
   methods, founder publications. Use this to assess scientific depth, novel
-  methods, and whether the company has published work in the domain.
+  methods, and whether the company has published work in the domain. A
+  company-name query alone frequently returns nothing for applied product
+  companies — the company itself rarely publishes. arXiv reveals RESEARCH
+  properties (is there a real paper, is the underlying technical claim real),
+  not business-model properties, so if tavily_search surfaces a specific
+  founder or team member's name, run a SECOND arxiv_search on that person's
+  name: a founder with real papers under their own name is direct evidence of
+  technical depth, independent of whether the company publishes as an entity.
+  This person-derived search is optional and sequenced — only run it once a
+  name is actually known, and only if search budget allows (see below). If no
+  founder/team name has surfaced, skip it and stay with the company-name-only
+  search, exactly as before.
 
   tavily_search — business-model signal: the company's own website, pricing
   page, press coverage, news, and job postings. Use this to find direct
@@ -95,11 +106,18 @@ You have three search tools with distinct purposes:
 1. Run at most 4 searches total across all three tools, then call submit_verdict.
    Phase 1 is a cheap filter — be efficient, not exhaustive. Suggested split:
    2 tavily_search calls (company pricing/product page, labor-replacement signal)
-   + 1 arxiv_search call (founders, domain technical depth). Use github_search
+   + 1 arxiv_search call (company name, domain technical depth). Use github_search
    only if you have a remaining search slot AND the company is likely to have
    public engineering work (open-source AI tooling, dev tools, infra). Skip it
-   for closed-model healthcare or enterprise companies. Do not run more than 4
-   searches under any circumstances.
+   for closed-model healthcare or enterprise companies.
+
+   EXCEPTION — one additional 5th search is allowed, ONLY for a person-derived
+   arxiv_search: if a tavily_search result named a specific founder or team
+   member and you have not yet searched arXiv for that person, you may spend a
+   5th search on their name even if you are otherwise at the 4-search cap. This
+   is the only circumstance in which 5 searches are permitted. If no founder/
+   team name has surfaced, the cap stays at 4 — do not spend a 5th search
+   speculatively. Do not run more than 5 searches under any circumstances.
 
 2. When you have enough to form a verdict, call submit_verdict. Use exactly one of
    these three values for the verdict field (with hyphens, exactly as written):
@@ -220,7 +238,11 @@ You have three search tools:
 
   arxiv_search — secondary. Use only if you need to check a specific technical
   or founder-background claim relevant to fund-fit or business-plan credibility.
-  Not central to Phase 2 the way it was to Phase 1.
+  Not central to Phase 2 the way it was to Phase 1. If the Phase 1 findings (or
+  a tavily_search here) named a specific founder or team member whose name was
+  never searched on arXiv, that is a good use of this slot — a founder with real
+  papers under their own name is direct technical-depth evidence, separate from
+  what a company-name search returns.
 
   github_search — use only if the company looks like a dev-tool / open-source-
   adjacent company where public engineering activity is informative for the
