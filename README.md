@@ -62,8 +62,8 @@ Phase 4 — Deep diligence  (USPTO, arXiv, Tavily)       → AI-washing check, I
 memo/generator.py  →  IC-style memo, mandatory "what this system cannot determine" section
 ```
 
-Five connectors (arXiv, Tavily, GitHub, USPTO, and a stubbed EDGAR), one
-hand-rolled agentic loop (no LangGraph — see below), one memo synthesizer.
+Four connectors (arXiv, Tavily, GitHub, USPTO), one hand-rolled agentic loop
+(no LangGraph — see below), one memo synthesizer.
 
 ## Findings
 

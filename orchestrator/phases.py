@@ -27,9 +27,10 @@ PHASE_DEFINITIONS: dict[int, PhaseDefinition] = {
         number=2,
         name="screening",
         # Same connector set as Phase 1 — Phase 2 differs by REASONING (pricing-model
-        # classifier, fund-fit, hiring signal), not by data source. EDGAR is deferred:
-        # near-empty for private startups, and every Phase 2 test in docs/phase-tests.md
-        # runs off Tavily (pricing pages, careers pages, news).
+        # classifier, fund-fit, hiring signal), not by data source. EDGAR was removed
+        # entirely: it indexes public-company filings only, and every company in this
+        # thesis's target universe is private; every Phase 2 test in docs/phase-tests.md
+        # runs off Tavily (pricing pages, careers pages, news) instead.
         connectors=[TavilyConnector(), ArxivConnector(), GitHubConnector()],
     ),
     3: PhaseDefinition(
