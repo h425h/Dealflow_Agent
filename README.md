@@ -187,3 +187,7 @@ prompt and a hard per-phase search cap (4 searches for Phases 1–2, 1 for Phase
   is built on.
 - [`docs/phase-tests.md`](docs/phase-tests.md) — the per-phase diligence test
   spec: exactly what each funnel phase tests a company for, and why.
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).
