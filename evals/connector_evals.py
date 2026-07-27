@@ -139,8 +139,8 @@ CASES: list[EvalCase] = [
         max_results=5,
         check=_check_absence,
         known_issue=(
-            "arXiv confidence is count-based, not relevance-based (PROGRESS.md Known "
-            "Limitations). Full-text OR-matching on words like 'Fictitious'/'Startup' "
+            "arXiv confidence is count-based, not relevance-based (known limitation). "
+            "Full-text OR-matching on words like 'Fictitious'/'Startup' "
             "returns 5 unrelated papers, which count-based scoring reads as 0.9 "
             "confidence — a false-positive signal, not a graceful absence."
         ),

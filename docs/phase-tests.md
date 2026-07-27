@@ -2,16 +2,16 @@
 
 This is the authoritative spec for WHAT each funnel phase tests a company for. When
 building or revising a phase's prompt (`orchestrator/prompts.py`), the tests below
-are the rubric that phase must apply. Read this alongside `docs/source-paper.md`
-(which has the underlying VC framework) and `CLAUDE.md` (the build rules).
+are the rubric that phase must apply. Read this alongside `docs/source-paper.md`,
+which has the underlying VC framework.
 
 Two important distinctions:
 
 1. **Diligence tests vs. system evals.** This document covers *diligence tests* —
    the VC-judgment questions the agent applies to a company. It does NOT cover
    *system evals* (how we verify the agent itself works — connector accuracy,
-   verdict validity, the LLM-as-judge harness). Those live in `evals/` and are
-   tracked separately in PROGRESS.md.
+   verdict validity, the LLM-as-judge harness). Those live in `evals/` — see
+   the Appendix at the end of this document.
 
 2. **Tests get progressively more expensive and more thesis-specific deeper in the
    funnel.** Phase 1 is cheap, high-recall exclusion. Phase 4 is costly,
@@ -205,7 +205,7 @@ Required outputs:
 
 ---
 
-## Appendix — System evals (different axis, tracked in PROGRESS.md, not here)
+## Appendix — System evals (a different axis from the diligence tests above)
 
 For completeness, so the two are not confused. These test the AGENT, not the
 company:

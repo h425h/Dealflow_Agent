@@ -158,10 +158,16 @@ prompt and a hard per-phase search cap (4 searches for Phases 1–2, 1 for Phase
 ## What's deliberately not built, and why
 
 - **No LangGraph.** The orchestrator is hand-rolled Python with the Anthropic
-  SDK's native tool use. Three migration triggers were named in advance
-  (persistence pain, branching pain, interrupt pain) and none has fired across
-  four phases and 9 build sessions — hand-rolled state passing has been enough.
-  See `docs/BUILD_NOTES.md` for the full trigger list.
+  SDK's native tool use. A port only happens once at least two of three
+  migration triggers are actually *felt*, not anticipated: **persistence
+  pain** (a run is interrupted and the JSON-per-phase saves aren't enough to
+  cleanly resume), **branching pain** (a phase needs to conditionally loop
+  back and the `if/elif` control flow in `cli/run.py` gets tangled), and
+  **interrupt pain** (wanting to pause mid-phase, not just between phases, and
+  the `input()` checkpoint is too blunt). None has fired across all four
+  phases — hand-rolled state passing has been enough. When they do, connectors
+  don't change: only the orchestration layer becomes a `StateGraph`, phases
+  become nodes, and `input()` becomes `interrupt()`.
 - **No paid data connectors.** Harmonic, PitchBook, and similar sit behind the
   same `Connector` interface every free connector implements, so swapping one
   in is additive, not a rewrite — but the free-data version is what actually
@@ -176,11 +182,8 @@ prompt and a hard per-phase search cap (4 searches for Phases 1–2, 1 for Phase
 - Full memos: [`data/memos/slang.ai_memo.md`](data/memos/slang.ai_memo.md)
   (advance) · [`data/memos/chatbase_memo.md`](data/memos/chatbase_memo.md)
   (kill) — or the rendered HTML versions in the same folder.
-- [`docs/BUILD_NOTES.md`](docs/BUILD_NOTES.md) — architecture, connector
-  interface, migration triggers, session workflow, the full "what NOT to do"
-  list.
 - [`docs/source-paper.md`](docs/source-paper.md) — the VC domain knowledge
   (Six Pensées, Seven Deadly Questions, the phase framework) this whole system
   is built on.
-- [`PROGRESS.md`](PROGRESS.md) — the session-by-session build log, including
-  every dead end and honestly-reported result.
+- [`docs/phase-tests.md`](docs/phase-tests.md) — the per-phase diligence test
+  spec: exactly what each funnel phase tests a company for, and why.
