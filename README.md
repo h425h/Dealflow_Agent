@@ -65,6 +65,12 @@ memo/generator.py  →  IC-style memo, mandatory "what this system cannot determ
 Three connectors (arXiv, Tavily, GitHub), one hand-rolled agentic loop
 (no LangGraph — see below), one memo synthesizer.
 
+The GitHub connector is scoped, not a general signal source: it's only
+meaningful for companies with a public dev surface (open-source cores, public
+SDKs, dev-tool components). For the median target here (closed vertical B2B
+SaaS), thin or neutral results are the normal case, not the exception, and
+absence of a GitHub presence is never scored as a negative.
+
 Phase 4's IP analysis runs on arXiv + Tavily reasoning only — there is no
 patent-database connector. A USPTO connector existed but its live-data path
 was never verified against a real authenticated query (a key requires

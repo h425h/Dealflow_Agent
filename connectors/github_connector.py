@@ -1,3 +1,17 @@
+"""
+GitHub connector.
+
+SCOPE — meaningful only for companies with a public dev surface: open-source
+cores, public SDKs, dev-tool components. For the median target company in this
+thesis (closed vertical B2B SaaS), thin or neutral GitHub results are the
+NORMAL case, not the exception — a closed healthcare, legal, or finance
+company legitimately has little or no public GitHub footprint. Absence of a
+GitHub presence is coded as neutral (confidence 0.0, no error), never as a
+negative signal; see the search() logic below and the Phase 1/2 prompts in
+orchestrator/prompts.py for how downstream reasoning is told to treat it. This
+connector complements arXiv/Tavily for the subset of companies where a public
+dev surface exists; it is not expected to fire meaningfully for most targets.
+"""
 import os
 import re
 from typing import Optional
